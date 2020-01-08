@@ -1,27 +1,11 @@
 import React, { useState } from 'react';
 import Select from 'react-select';
+import styled from 'styled-components';
+
+const DotaSelect = styled(Select)``;
 
 function HeroSelector(props) {
   const [selected, setSelected] = useState(null);
-
-  const styles = {
-    option: (provided, state) => ({
-      ...provided,
-      borderBottom: '1px solid pink',
-      color: state.isSelected ? 'red' : 'blue',
-      padding: 100,
-    }),
-    control: () => ({
-      // none of react-select's styles are passed to <Control />
-      width: 200,
-    }),
-    singleValue: (provided, state) => {
-      const opacity = state.isDisabled ? 0.5 : 1;
-      const transition = 'opacity 300ms';
-
-      return { ...provided, opacity, transition };
-    },
-  };
 
   const handleChange = selection => {
     let team = props.team;
@@ -37,8 +21,7 @@ function HeroSelector(props) {
   };
 
   return (
-    <Select
-      style={styles}
+    <DotaSelect
       value={selected}
       onChange={handleChange}
       isClearable="true"
@@ -47,6 +30,15 @@ function HeroSelector(props) {
         value: option.id,
         label: option.localized_name,
       }))}
+      theme={theme => ({
+        ...theme,
+        colors: {
+          ...theme.colors,
+          text: 'orangered',
+          primary25: 'hotpink',
+          primary: 'black',
+        },
+      })}
     />
   );
 }
