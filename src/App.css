@@ -15,8 +15,12 @@ body{
   grid-template-rows: 3fr 3fr 1fr;
 }
 .container > div {
-  border: 3px dashed #B44335;
+  border: 5px solid #B44335;
   background-color: #1B1E21;
+}
+
+.team-title {
+  color: #FEFEFE;
 }
 
 .left {
@@ -28,10 +32,12 @@ body{
 .top-right {
   grid-area: top-right;
   margin: 1rem;
-}
+  padding-top: 0.75rem;
+} 
 .bottom-right {
   grid-area: bottom-right;
   margin: 1rem;
+  padding-top: 0.75rem;
 }
 .bottom-bar {
   grid-area: bottom-bar;

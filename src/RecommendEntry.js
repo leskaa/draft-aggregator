@@ -3,14 +3,26 @@ import styled from 'styled-components';
 
 const NameList = styled.li`
   font-family: 'Gothic A1', sans-serif;
-  font-size: 0.5cm;
-  border: 2px solid;
+  font-size: 0.7cm;
+  border: 5px solid;
+  border-bottom: 0px solid;
   border-color: #2f363d;
   box-decoration-break: clone;
   list-style-type: none;
+  height: 33px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 `;
+
+const Name = styled.div`
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+`;
+
 const Winrate = styled.span`
-  float: right;
+  margin-left: auto;
+  order: 2;
 `;
 
 function RecommendEntry(props) {
@@ -18,10 +30,8 @@ function RecommendEntry(props) {
   return (
     <NameList key={props.heroId}>
       <img src={imageURL} alt={props.name}></img>
-      {props.name}
-      <Winrate>
-        winrate: {(props.winrate * 100).toString().substr(0, 4)}%
-      </Winrate>
+      <Name>{props.name}</Name>
+      <Winrate>{(props.winrate * 100).toString().substr(0, 4)}%</Winrate>
     </NameList>
   );
 }
