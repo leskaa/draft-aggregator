@@ -51,6 +51,7 @@ function App(props) {
       averageTeamData.push({
         heroId: teamData[0].matchups[i].heroId,
         name: matchupOptions[i].localized_name,
+        short_name: matchupOptions[i].short_name,
         winrate: total / teamData.length,
       });
     }
@@ -136,18 +137,35 @@ function App(props) {
           throw new Error('Non-200 Response');
         }
       })
-      .then(data =>
+      .then(data => {
         setOptions(
           Object.values(data).map(option => ({
             id: option.id,
             localized_name: option.displayName,
+            short_name: option.shortName,
           }))
-        )
-      )
+        );
+      })
       .catch(error =>
         console.log('Stratz API hero list fetch failed: ' + error)
       );
-  }, []);
+    // options.forEach(option => {
+    //   fetch(
+    //     `http://cdn.dota2.com/apps/dota2/images/heroes/${option.short_name}_sb.png`
+    //   )
+    //     .then(response => {
+    //       if (response.ok) {
+    //         return response.text();
+    //       } else {
+    //         throw new Error('Non-200 Response for dota2 cdn');
+    //       }
+    //     })
+    //     .then(data => {
+    //       option.image = data;
+    //     })
+    //     .catch(error => console.log('dota2 cdn fetch failed: ' + error));
+    // });
+  }, [options]);
 
   return (
     <div className="container">
