@@ -52,6 +52,7 @@ function HeroSelector(props) {
       value={selected}
       onChange={handleChange}
       isClearable="true"
+      placeholder=""
       options={props.options.map(option => ({
         value: option.id,
         label: option.localized_name,

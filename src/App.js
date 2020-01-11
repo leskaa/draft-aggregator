@@ -149,30 +149,30 @@ function App(props) {
       .catch(error =>
         console.log('Stratz API hero list fetch failed: ' + error)
       );
-    // options.forEach(option => {
-    //   fetch(
-    //     `http://cdn.dota2.com/apps/dota2/images/heroes/${option.short_name}_sb.png`
-    //   )
-    //     .then(response => {
-    //       if (response.ok) {
-    //         return response.text();
-    //       } else {
-    //         throw new Error('Non-200 Response for dota2 cdn');
-    //       }
-    //     })
-    //     .then(data => {
-    //       option.image = data;
-    //     })
-    //     .catch(error => console.log('dota2 cdn fetch failed: ' + error));
-    // });
-  }, [options]);
+    // fetch('https://api.stratz.com/api/v1/Hero/directory/detail')
+    //   .then(response => {
+    //     if (response.ok) {
+    //       return response.json();
+    //     } else {
+    //       throw new Error('Non-200 Response');
+    //     }
+    //   })
+    //   .then(data => {
+    //     console.log('DETAILS DATA');
+    //     console.log(data);
+    //   })
+    //   .catch(error =>
+    //     console.log('Stratz API hero details fetch failed: ' + error)
+    //   );
+  }, []);
 
   return (
     <div className="container">
       <div className="top-right">
         <p className="team-title">Allies</p>
-        {[...Array(5)].map(() => (
+        {[...Array(5)].map((e, i) => (
           <HeroSelector
+            key={i}
             removeFromTeam={removeFromTeam}
             addToTeam={addToTeam}
             options={options}
@@ -182,8 +182,9 @@ function App(props) {
       </div>
       <div className="bottom-right">
         <p className="team-title">Opponents</p>
-        {[...Array(5)].map(() => (
+        {[...Array(5)].map((e, i) => (
           <HeroSelector
+            key={i}
             removeFromTeam={removeFromTeam}
             addToTeam={addToTeam}
             options={options}
