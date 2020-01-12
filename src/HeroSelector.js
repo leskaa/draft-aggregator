@@ -35,12 +35,12 @@ function HeroSelector(props) {
 
   const handleChange = selection => {
     let team = props.team;
-    if (selection == null) {
+    if (selected && !selection) {
       props.removeFromTeam(selected.value, team);
-    } else if (selected != null) {
+    } else if (selected) {
       props.removeFromTeam(selected.value, team);
       props.addToTeam(selection.value, team);
-    } else {
+    } else if (selection) {
       props.addToTeam(selection.value, team);
     }
     setSelected(selection);
