@@ -149,21 +149,6 @@ function App(props) {
       .catch(error =>
         console.log('Stratz API hero list fetch failed: ' + error)
       );
-    // fetch('https://api.stratz.com/api/v1/Hero/directory/detail')
-    //   .then(response => {
-    //     if (response.ok) {
-    //       return response.json();
-    //     } else {
-    //       throw new Error('Non-200 Response');
-    //     }
-    //   })
-    //   .then(data => {
-    //     console.log('DETAILS DATA');
-    //     console.log(data);
-    //   })
-    //   .catch(error =>
-    //     console.log('Stratz API hero details fetch failed: ' + error)
-    //   );
   }, []);
 
   return (
