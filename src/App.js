@@ -152,33 +152,40 @@ function App(props) {
   }, []);
 
   return (
-    <div className="container">
-      <div className="top-right">
-        <p className="team-title">Allies</p>
-        {[...Array(5)].map((e, i) => (
-          <HeroSelector
-            key={i}
-            removeFromTeam={removeFromTeam}
-            addToTeam={addToTeam}
-            options={options}
-            team="0"
-          ></HeroSelector>
-        ))}
+    <div>
+      <div className="header">
+        <h1>
+          <span className="dota-title">Dota 2</span> Draft Strategy Tool
+        </h1>
       </div>
-      <div className="bottom-right">
-        <p className="team-title">Opponents</p>
-        {[...Array(5)].map((e, i) => (
-          <HeroSelector
-            key={i}
-            removeFromTeam={removeFromTeam}
-            addToTeam={addToTeam}
-            options={options}
-            team="1"
-          ></HeroSelector>
-        ))}
-      </div>
-      <div className="left">
-        <RecommendPanel recommendations={recommendations}></RecommendPanel>
+      <div className="container">
+        <div className="top-right">
+          <p className="team-title">Allies</p>
+          {[...Array(5)].map((e, i) => (
+            <HeroSelector
+              key={i}
+              removeFromTeam={removeFromTeam}
+              addToTeam={addToTeam}
+              options={options}
+              team="0"
+            ></HeroSelector>
+          ))}
+        </div>
+        <div className="bottom-right">
+          <p className="team-title">Opponents</p>
+          {[...Array(5)].map((e, i) => (
+            <HeroSelector
+              key={i}
+              removeFromTeam={removeFromTeam}
+              addToTeam={addToTeam}
+              options={options}
+              team="1"
+            ></HeroSelector>
+          ))}
+        </div>
+        <div className="left">
+          <RecommendPanel recommendations={recommendations}></RecommendPanel>
+        </div>
       </div>
     </div>
   );

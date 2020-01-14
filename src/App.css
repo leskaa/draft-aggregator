@@ -43,6 +43,16 @@ body{
   grid-area: bottom-bar;
 }
 
+.header {
+  text-align: center;
+  color: #FEFEFE;
+  text-shadow: 2px 4px 3px #1B1E21;
+}
+
+.dota-title {
+  color: #A52A2A;
+}
+
 .team-title {
   text-align: center;
   font-weight: bold;
