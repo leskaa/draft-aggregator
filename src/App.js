@@ -340,12 +340,12 @@ function App(props) {
 
   return (
     <div>
-      <div className="header">
-        <h1>
-          <span className="dota-title">Dota 2</span> Draft Strategy Tool
-        </h1>
-      </div>
       <div className="container">
+        <div className="header">
+          <h1>
+            <span className="dota-title">Dota 2</span> Draft Strategy Tool
+          </h1>
+        </div>
         <div className="config">
           <p className="team-title">Configure Weights</p>
           <ConfigPanel onChange={handleConfigChange} />

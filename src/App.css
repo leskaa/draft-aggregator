@@ -1,62 +1,66 @@
-body{
-  background-color: #2F363D;
+body {
+  background-color: #2f363d;
 }
 .container {
-  background-color: #2F363D;
+  background-color: #2f363d;
   display: grid;
   width: 100%;
   height: 100%;
   grid-template-areas:
-    'left config'
+    'header config'
     'left top-right'
     'left bottom-right'
     'bottom-bar bottom-bar';
   grid-template-columns: 3fr 2fr;
-  grid-template-rows: 1.5fr 3fr 3fr 0.5fr;
+  grid-template-rows: 0.5fr 2fr 2fr 0.5fr;
 }
-.container > div {
-  border: 5px solid #B44335;
-  background-color: #1B1E21;
-}
-
 .team-title {
-  color: #FEFEFE;
+  color: #fefefe;
 }
-
 .left {
   grid-area: left;
-  height: 80vh;
+  height: 75vh;
   overflow: hidden;
   overflow-y: scroll;
+  border: 5px solid #a52a2a;
+  background-color: #1b1e21;
 }
 .config {
   grid-area: config;
-  margin: 1rem;
-  padding-top: 0.5rem;
-} 
+  margin: 0.5rem;
+}
 .top-right {
   grid-area: top-right;
-  margin: 1rem;
-  padding-top: 0.5rem;
-} 
+  margin: 0.75rem;
+  margin-top: 0em;
+  padding-top: 0.25rem;
+  border: 5px solid #a52a2a;
+  background-color: #1b1e21;
+  padding-bottom: 0.5rem;
+}
 .bottom-right {
   grid-area: bottom-right;
-  margin: 1rem;
-  padding-top: 0.5rem;
+  margin: 0.75rem;
+  margin-top: 0em;
+  padding-top: 0.25rem;
+  border: 5px solid #a52a2a;
+  background-color: #1b1e21;
+  padding-bottom: 0.5rem;
 }
 .bottom-bar {
   grid-area: bottom-bar;
-  margin: 1rem;
+  margin: 0.5rem;
 }
 
 .header {
+  padding-top: 0.5em;
   text-align: center;
-  color: #FEFEFE;
-  text-shadow: 2px 4px 3px #1B1E21;
+  color: #fefefe;
+  text-shadow: 2px 4px 3px #1b1e21;
 }
 
 .dota-title {
-  color: #A52A2A;
+  color: #a52a2a;
 }
 
 .team-title {
@@ -72,19 +76,17 @@ body{
 
 /* Track */
 ::-webkit-scrollbar-track {
-  box-shadow: inset 0 0 5px #1B1E21;
+  box-shadow: inset 0 0 5px #1b1e21;
   border-radius: 5px;
-
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background-color: rgba(47,54,61,1);
+  background-color: rgba(47, 54, 61, 1);
   border-radius: 20px;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(47,54,61,0.8);
+  background-color: rgba(47, 54, 61, 0.8);
 }
-

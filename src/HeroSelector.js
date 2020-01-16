@@ -3,7 +3,7 @@ import Select from 'react-select';
 import styled from 'styled-components';
 
 const DotaSelect = styled(Select)`
-  padding: 0.4em;
+  padding: 0.25em;
   margin-left: 0.5em;
   margin-right: 0.5em;
   color: #a0a3a6;
@@ -13,6 +13,8 @@ const customStyles = {
   control: (base, state) => ({
     ...base,
     background: '#2F363D',
+    height: '36px',
+    minHeight: '36px',
     // match with the menu
     borderRadius: state.isFocused ? '3px 3px 0 0' : 3,
     // Overwrittes the different states of border
@@ -34,14 +36,10 @@ function HeroSelector(props) {
   const [selected, setSelected] = useState(null);
 
   const handleChange = selection => {
-    let team = props.team;
-    if (selected && !selection) {
-      props.removeFromTeam(selected.value, team);
-    } else if (selected) {
-      props.removeFromTeam(selected.value, team);
-      props.addToTeam(selection.value, team);
+    if (selected) {
+      props.removeFromTeam(selected.value, props.team);
     } else if (selection) {
-      props.addToTeam(selection.value, team);
+      props.addToTeam(selection.value, props.team);
     }
     setSelected(selection);
   };

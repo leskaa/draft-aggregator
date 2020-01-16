@@ -4,15 +4,15 @@ import ReactSlider from 'react-slider';
 
 const StyledSlider = styled(ReactSlider)`
   width: 90%;
-  height: 25px;
-  margin-top: 25px;
+  height: 1.5rem;
+  margin-top: 0.5rem;
   margin-left: 5%;
 `;
 
 const StyledThumb = styled.div`
-  height: 25px;
-  line-height: 25px;
-  width: 25px;
+  height: 1.5rem;
+  line-height: 1.5rem;
+  width: 1.5rem;
   text-align: center;
   background-color: #2f363d;
   color: #fefefe;
@@ -35,17 +35,17 @@ const StyledTrack = styled.div`
 const Track = (props, state) => <StyledTrack {...props} index={state.index} />;
 
 const ReasonCounters = styled.span`
-  font-size: 0.5cm;
+  font-size: 1rem;
   color: #167c13;
 `;
 
 const ReasonMeta = styled.span`
-  font-size: 0.5cm;
+  font-size: 1rem;
   color: #daa520;
 `;
 
 const ReasonPubMeta = styled.span`
-  font-size: 0.5cm;
+  font-size: 1rem;
   color: #64d74a;
 `;
 
@@ -54,7 +54,7 @@ const FlexContainer = styled.div`
   justify-content: space-between;
   margin-left: 3em;
   margin-right: 3em;
-  margin-top: 0.5em;
+  margin-top: 0em;
 `;
 
 function ConfigPanel(props) {
