@@ -45,14 +45,20 @@ function App(props) {
     let averageTeamData = [];
     for (let i = 0; i < matchupOptions.length; i++) {
       let total = 0;
+      let heroList = [];
       teamData.forEach(matchupSet => {
         total += matchupSet.matchups[i].winrate;
+        heroList.push({
+          hero: matchupSet.hero,
+          winrate: matchupSet.matchups[i].winrate,
+        });
       });
       averageTeamData.push({
         heroId: teamData[0].matchups[i].heroId,
         name: matchupOptions[i].localized_name,
         short_name: matchupOptions[i].short_name,
         winrate: total / teamData.length,
+        heroList: heroList,
       });
     }
     averageTeamData.sort((a, b) => (a.winrate < b.winrate ? 1 : -1));
