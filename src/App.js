@@ -45,11 +45,18 @@ function App(props) {
     let averageTeamData = [];
     for (let i = 0; i < matchupOptions.length; i++) {
       let total = 0;
-      let heroList = [];
+      let reasonList = [];
       teamData.forEach(matchupSet => {
         total += matchupSet.matchups[i].winrate;
-        heroList.push({
+        reasonList.push({
           hero: matchupSet.hero,
+          name: options.filter(option => option.id === matchupSet.hero)[0]
+            .localized_name,
+          team:
+            counters.filter(counter => counter.hero === matchupSet.hero)
+              .length > 0
+              ? 'counter'
+              : 'synergy',
           winrate: matchupSet.matchups[i].winrate,
         });
       });
@@ -58,7 +65,7 @@ function App(props) {
         name: matchupOptions[i].localized_name,
         short_name: matchupOptions[i].short_name,
         winrate: total / teamData.length,
-        heroList: heroList,
+        reasonList: reasonList,
       });
     }
     averageTeamData.sort((a, b) => (a.winrate < b.winrate ? 1 : -1));
@@ -68,7 +75,6 @@ function App(props) {
   // TODO: Improve selection option logic
   // https://stackoverflow.com/questions/26137309/remove-selected-option-from-another-select-box
   const removeFromTeam = (heroId, team) => {
-    console.log('remove: ' + heroId);
     if (team === '0') {
       setAllies(allies.filter(ally => ally !== heroId));
       setSynergies(synergies.filter(matchupSet => matchupSet.hero !== heroId));
@@ -80,7 +86,6 @@ function App(props) {
 
   // TODO: Add loading to deal with api delay
   const addToTeam = (heroId, team) => {
-    console.log('add: ' + heroId);
     if (team === '0') {
       setAllies([...allies, heroId]);
     } else if (team === '1') {

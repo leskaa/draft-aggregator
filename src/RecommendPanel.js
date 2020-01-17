@@ -20,6 +20,7 @@ function RecommendPanel(props) {
           name={recommendation.name}
           winrate={recommendation.winrate}
           imageName={recommendation.short_name}
+          reasonList={recommendation.reasonList}
         ></RecommendEntry>
       ))}
     </RecommendationsList>
