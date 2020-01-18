@@ -93,7 +93,7 @@ function App(props) {
     }
     // TODO: Using Stratz API
     fetch(
-      `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=5,6,7,8&matchLimit=0`
+      `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=0,1,2,3,4,5,6,7,8&matchLimit=0`
     )
       .then(response => {
         if (response.ok) {
