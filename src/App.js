@@ -8,6 +8,7 @@ import './App.css';
 
 function App(props) {
   const [options, setOptions] = useState([]);
+  const [proPickRate, setProPickRate] = useState([]);
   const [allies, setAllies] = useState([]);
   const [opponents, setOpponents] = useState([]);
   const [synergies, setSynergies] = useState([]);
@@ -43,6 +44,13 @@ function App(props) {
     });
     // Calculate the average matchup values
     let averageTeamData = [];
+    const mostContestedRateHero = proPickRate.reduce((x, y) => {
+      const xContested = x.picks + x.bans;
+      const yContested = y.picks + y.bans;
+      return xContested > yContested ? x : y;
+    });
+    const mostContestedRate =
+      mostContestedRateHero.picks + mostContestedRateHero.bans;
     for (let i = 0; i < matchupOptions.length; i++) {
       let total = 0;
       let reasonList = [];
@@ -60,17 +68,30 @@ function App(props) {
           winrate: matchupSet.matchups[i].winrate,
         });
       });
+      let heroPickRate = proPickRate.find(
+        hero => hero.id === teamData[0].matchups[i].heroId
+      );
+      let contestedRate = heroPickRate.picks + heroPickRate.bans;
+      reasonList.push({
+        hero: teamData[0].matchups[i].heroId,
+        name: matchupOptions[i].localized_name,
+        team: 'meta',
+        winrate: Math.pow(contestedRate / mostContestedRate - 0.5, 3) + 0.55,
+      });
       averageTeamData.push({
         heroId: teamData[0].matchups[i].heroId,
         name: matchupOptions[i].localized_name,
         short_name: matchupOptions[i].short_name,
-        winrate: total / teamData.length,
+        winrate:
+          ((total / teamData.length) * 4 +
+            (Math.pow(contestedRate / mostContestedRate - 0.5, 3) + 0.55)) /
+          5,
         reasonList: reasonList,
       });
     }
     averageTeamData.sort((a, b) => (a.winrate < b.winrate ? 1 : -1));
     setRecommendations(averageTeamData);
-  }, [allies, counters, opponents, options, synergies]);
+  }, [allies, counters, opponents, options, proPickRate, synergies]);
 
   // TODO: Improve selection option logic
   // https://stackoverflow.com/questions/26137309/remove-selected-option-from-another-select-box
@@ -107,7 +128,7 @@ function App(props) {
           const mappedMatchups = data[0].with.map(matchup => ({
             // Half the weight of counters
             hero_id: matchup.heroId2,
-            winrate: 0.5 + matchup.synergy / 200,
+            winrate: 0.5 + matchup.synergy / 100,
           }));
           const uniqueMappedMatchups = array.uniqBy(mappedMatchups, 'hero_id');
           setSynergies([
@@ -159,6 +180,29 @@ function App(props) {
       })
       .catch(error =>
         console.log('Stratz API hero list fetch failed: ' + error)
+      );
+  }, []);
+
+  useEffect(() => {
+    fetch('https://api.opendota.com/api/heroStats')
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error('Non-200 Response');
+        }
+      })
+      .then(data => {
+        setProPickRate(
+          data.map(hero => ({
+            id: hero.id,
+            picks: hero.pro_pick,
+            bans: hero.pro_ban,
+          }))
+        );
+      })
+      .catch(error =>
+        console.log('OpenDota API heroStats fetch failed: ' + error)
       );
   }, []);
 

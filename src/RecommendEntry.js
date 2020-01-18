@@ -53,6 +53,22 @@ const ReasonAntiSynergy = styled.span`
   color: #4682b4;
 `;
 
+const ReasonMeta = styled.span`
+  font-size: 0.4cm;
+  margin: 2em;
+  flex: 1;
+  min-width: 8em;
+  color: #daa520;
+`;
+
+const ReasonNotMeta = styled.span`
+  font-size: 0.4cm;
+  margin: 2em;
+  flex: 1;
+  min-width: 8em;
+  color: #5b388f;
+`;
+
 const Winrate = styled.span`
   margin-left: auto;
   order: 3;
@@ -60,11 +76,12 @@ const Winrate = styled.span`
 
 function RecommendEntry(props) {
   let imageURL = `http://cdn.dota2.com/apps/dota2/images/heroes/${props.imageName}_sb.png`;
+  console.log(props.reasonList);
   let topReasons =
     props.winrate > 0.5
       ? props.reasonList
           .sort((a, b) => b.winrate - a.winrate)
-          .filter(reason => reason.winrate > 0.55)
+          .filter(reason => reason.winrate > 0.5)
           .slice(0, 2)
       : props.reasonList
           .sort((a, b) => a.winrate - b.winrate)
@@ -75,8 +92,34 @@ function RecommendEntry(props) {
       <img src={imageURL} alt={props.name}></img>
       <Name>{props.name}</Name>
       {topReasons.map((e, i) => {
+        if (e.team === 'meta') {
+          if (e.winrate > 0.5) {
+            return (
+              <ReasonMeta key={i}>
+                Pro{' '}
+                <strong>
+                  Meta{' '}
+                  <span role="img" aria-label="Sparkle">
+                    ✨
+                  </span>
+                </strong>
+              </ReasonMeta>
+            );
+          }
+          return (
+            <ReasonNotMeta key={i}>
+              Not{' '}
+              <strong>
+                Meta{' '}
+                <span role="img" aria-label="Eggplant">
+                  🍆
+                </span>
+              </strong>
+            </ReasonNotMeta>
+          );
+        }
         if (e.team === 'counter') {
-          if (e.winrate > 0.55) {
+          if (e.winrate > 0.5) {
             return (
               <ReasonCounters key={i}>
                 Counters <strong>{e.name}</strong>
@@ -89,7 +132,7 @@ function RecommendEntry(props) {
             </ReasonCountered>
           );
         }
-        if (e.winrate > 0.55) {
+        if (e.winrate > 0.5) {
           return (
             <ReasonSynergizes key={i}>
               Synergy <strong>{e.name}</strong>
