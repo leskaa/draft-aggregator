@@ -22,50 +22,56 @@ const Name = styled.div`
 `;
 
 const ReasonCounters = styled.span`
-  font-size: 0.4cm;
-  margin: 2em;
+  font-size: 0.35cm;
+  margin: 1em;
+  margin-left: 0.5em;
   flex: 1;
-  min-width: 8em;
+  min-width: 11em;
   color: #167c13;
 `;
 
 const ReasonSynergizes = styled.span`
-  font-size: 0.4cm;
-  margin: 2em;
+  font-size: 0.35cm;
+  margin: 1em;
+  margin-left: 0.5em;
   flex: 1;
-  min-width: 8em;
+  min-width: 11em;
   color: #598307;
 `;
 
 const ReasonCountered = styled.span`
-  font-size: 0.4cm;
-  margin: 2em;
+  font-size: 0.35cm;
+  margin: 1em;
+  margin-left: 0.5em;
   flex: 1;
-  min-width: 8em;
+  min-width: 11em;
   color: #a52a2a;
 `;
 
 const ReasonAntiSynergy = styled.span`
-  font-size: 0.4cm;
-  margin: 2em;
+  font-size: 0.35cm;
+  margin: 1em;
+  margin-left: 0.5em;
   flex: 1;
-  min-width: 8em;
+  min-width: 11em;
   color: #4682b4;
 `;
 
 const ReasonMeta = styled.span`
-  font-size: 0.4cm;
-  margin: 2em;
+  font-size: 0.35cm;
+  margin: 1em;
+  margin-left: 0.5em;
   flex: 1;
-  min-width: 8em;
+  min-width: 11em;
   color: #daa520;
 `;
 
 const ReasonNotMeta = styled.span`
-  font-size: 0.4cm;
-  margin: 2em;
+  font-size: 0.35cm;
+  margin: 1em;
+  margin-left: 0.5em;
   flex: 1;
-  min-width: 8em;
+  min-width: 11em;
   color: #5b388f;
 `;
 
@@ -78,7 +84,7 @@ function RecommendEntry(props) {
   let imageURL = `http://cdn.dota2.com/apps/dota2/images/heroes/${props.imageName}_sb.png`;
   let topReasons = props.reasonList
     .sort((a, b) => Math.abs(b.winrate - 0.5) - Math.abs(a.winrate - 0.5))
-    .filter(reason => Math.abs(reason.winrate - 0.5) > 0.05)
+    .filter(reason => Math.abs(reason.winrate - 0.5) > 0.025)
     .slice(0, 2);
   return (
     <NameList key={props.heroId}>
@@ -115,26 +121,30 @@ function RecommendEntry(props) {
           if (e.winrate > 0.5) {
             return (
               <ReasonCounters key={i}>
-                Counters <strong>{e.name}</strong>
+                Counters <br />
+                <strong>{e.name}</strong>
               </ReasonCounters>
             );
           }
           return (
             <ReasonCountered key={i}>
-              Is Countered <strong>{e.name}</strong>
+              Countered <br />
+              <strong>{e.name} </strong>
             </ReasonCountered>
           );
         }
         if (e.winrate > 0.5) {
           return (
             <ReasonSynergizes key={i}>
-              Synergy <strong>{e.name}</strong>
+              Synergy <br />
+              <strong>{e.name}</strong>
             </ReasonSynergizes>
           );
         }
         return (
           <ReasonAntiSynergy key={i}>
-            Anti Synergy <strong>{e.name}</strong>
+            Synergy <br />
+            <strong>{e.name}</strong>
           </ReasonAntiSynergy>
         );
       })}

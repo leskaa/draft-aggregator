@@ -76,7 +76,7 @@ function App(props) {
         hero: teamData[0].matchups[i].heroId,
         name: matchupOptions[i].localized_name,
         team: 'meta',
-        winrate: Math.pow(contestedRate / mostContestedRate - 0.5, 3) + 0.56,
+        winrate: Math.pow(contestedRate / mostContestedRate - 0.5, 3) + 0.55,
       });
       averageTeamData.push({
         heroId: teamData[0].matchups[i].heroId,
@@ -84,7 +84,7 @@ function App(props) {
         short_name: matchupOptions[i].short_name,
         winrate:
           ((total / teamData.length) * 4 +
-            (Math.pow(contestedRate / mostContestedRate - 0.5, 3) + 0.6)) /
+            (Math.pow(contestedRate / mostContestedRate - 0.5, 3) + 0.55)) /
           5,
         reasonList: reasonList,
       });
@@ -113,23 +113,76 @@ function App(props) {
       setOpponents([...opponents, heroId]);
     }
     // TODO: Using Stratz API
-    fetch(
-      `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=0,1,2,3,4,5,6,7,8&matchLimit=0&week=2610`
-    )
-      .then(response => {
+    Promise.all([
+      fetch(
+        `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=0,1,2,3,4,5,6,7,8&matchLimit=0&week=2607`
+      ).then(response => {
         if (response.ok) {
           return response.json();
         } else {
           throw new Error('Non-200 Response');
         }
-      })
-      .then(data => {
+      }),
+      fetch(
+        `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=0,1,2,3,4,5,6,7,8&matchLimit=0&week=2608`
+      ).then(response => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error('Non-200 Response');
+        }
+      }),
+      fetch(
+        `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=0,1,2,3,4,5,6,7,8&matchLimit=0&week=2609`
+      ).then(response => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error('Non-200 Response');
+        }
+      }),
+      fetch(
+        `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=0,1,2,3,4,5,6,7,8&matchLimit=0&week=2610`
+      ).then(response => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error('Non-200 Response');
+        }
+      }),
+      fetch(
+        `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=0,1,2,3,4,5,6,7,8&matchLimit=0`
+      ).then(response => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error('Non-200 Response');
+        }
+      }),
+    ])
+      .then(([data, data2, data3, data4, data5]) => {
         if (team === '0') {
-          const mappedMatchups = data[0].with.map(matchup => ({
-            // Half the weight of counters
-            hero_id: matchup.heroId2,
-            winrate: 0.53 + matchup.synergy / 80,
-          }));
+          const with1 = data[0].with.sort((a, b) => a.id - b.id);
+          const with2 = data2[0].with.sort((a, b) => a.id - b.id);
+          const with3 = data3[0].with.sort((a, b) => a.id - b.id);
+          const with4 = data4[0].with.sort((a, b) => a.id - b.id);
+          const with5 = data5[0].with.sort((a, b) => a.id - b.id);
+          let mappedMatchups = [];
+          for (let i = 0; i < data[0].with.length; i++) {
+            mappedMatchups.push({
+              hero_id: with1[i].heroId2,
+              winrate:
+                0.5 +
+                (with1[i].synergy +
+                  with2[i].synergy +
+                  with3[i].synergy +
+                  with4[i].synergy +
+                  with5[i].synergy) /
+                  500 /
+                  // Slightly lower weight than counters
+                  1.5,
+            });
+          }
           const uniqueMappedMatchups = array.uniqBy(mappedMatchups, 'hero_id');
           setSynergies([
             ...synergies,
@@ -140,14 +193,25 @@ function App(props) {
             },
           ]);
         } else if (team === '1') {
-          const mappedMatchups = data[0].vs.map(matchup => ({
-            hero_id: matchup.heroId2,
-            winrate:
-              1 -
-              (matchup.matchCount < data[0].matchCountVs / options.length / 5
-                ? (matchup.wins - 0.5) / 10 + 0.5
-                : matchup.wins),
-          }));
+          const vs1 = data[0].vs.sort((a, b) => a.id - b.id);
+          const vs2 = data2[0].vs.sort((a, b) => a.id - b.id);
+          const vs3 = data3[0].vs.sort((a, b) => a.id - b.id);
+          const vs4 = data4[0].vs.sort((a, b) => a.id - b.id);
+          const vs5 = data5[0].vs.sort((a, b) => a.id - b.id);
+          let mappedMatchups = [];
+          for (let i = 0; i < data[0].vs.length; i++) {
+            mappedMatchups.push({
+              hero_id: vs1[i].heroId2,
+              winrate:
+                0.5 -
+                (vs1[i].synergy +
+                  vs2[i].synergy +
+                  vs3[i].synergy +
+                  vs4[i].synergy +
+                  vs5[i].synergy) /
+                  500,
+            });
+          }
           const uniqueMappedMatchups = array.uniqBy(mappedMatchups, 'hero_id');
           setCounters([
             ...counters,
