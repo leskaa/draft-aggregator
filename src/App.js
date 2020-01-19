@@ -114,7 +114,7 @@ function App(props) {
     }
     // TODO: Using Stratz API
     fetch(
-      `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=0,1,2,3,4,5,6,7,8&matchLimit=0`
+      `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=0,1,2,3,4,5,6,7,8&matchLimit=0&week=2610`
     )
       .then(response => {
         if (response.ok) {
@@ -142,7 +142,11 @@ function App(props) {
         } else if (team === '1') {
           const mappedMatchups = data[0].vs.map(matchup => ({
             hero_id: matchup.heroId2,
-            winrate: 0.53 - matchup.synergy / 50,
+            winrate:
+              1 -
+              (matchup.matchCount < data[0].matchCountVs / options.length / 5
+                ? (matchup.wins - 0.5) / 10 + 0.5
+                : matchup.wins),
           }));
           const uniqueMappedMatchups = array.uniqBy(mappedMatchups, 'hero_id');
           setCounters([
