@@ -76,17 +76,10 @@ const Winrate = styled.span`
 
 function RecommendEntry(props) {
   let imageURL = `http://cdn.dota2.com/apps/dota2/images/heroes/${props.imageName}_sb.png`;
-  console.log(props.reasonList);
-  let topReasons =
-    props.winrate > 0.5
-      ? props.reasonList
-          .sort((a, b) => b.winrate - a.winrate)
-          .filter(reason => reason.winrate > 0.5)
-          .slice(0, 2)
-      : props.reasonList
-          .sort((a, b) => a.winrate - b.winrate)
-          .filter(reason => reason.winrate < 0.45)
-          .slice(0, 2);
+  let topReasons = props.reasonList
+    .sort((a, b) => Math.abs(b.winrate - 0.5) - Math.abs(a.winrate - 0.5))
+    .filter(reason => Math.abs(reason.winrate - 0.5) > 0.05)
+    .slice(0, 2);
   return (
     <NameList key={props.heroId}>
       <img src={imageURL} alt={props.name}></img>

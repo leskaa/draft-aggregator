@@ -76,7 +76,7 @@ function App(props) {
         hero: teamData[0].matchups[i].heroId,
         name: matchupOptions[i].localized_name,
         team: 'meta',
-        winrate: Math.pow(contestedRate / mostContestedRate - 0.5, 3) + 0.55,
+        winrate: Math.pow(contestedRate / mostContestedRate - 0.5, 3) + 0.56,
       });
       averageTeamData.push({
         heroId: teamData[0].matchups[i].heroId,
@@ -84,7 +84,7 @@ function App(props) {
         short_name: matchupOptions[i].short_name,
         winrate:
           ((total / teamData.length) * 4 +
-            (Math.pow(contestedRate / mostContestedRate - 0.5, 3) + 0.55)) /
+            (Math.pow(contestedRate / mostContestedRate - 0.5, 3) + 0.6)) /
           5,
         reasonList: reasonList,
       });
@@ -128,7 +128,7 @@ function App(props) {
           const mappedMatchups = data[0].with.map(matchup => ({
             // Half the weight of counters
             hero_id: matchup.heroId2,
-            winrate: 0.5 + matchup.synergy / 100,
+            winrate: 0.53 + matchup.synergy / 80,
           }));
           const uniqueMappedMatchups = array.uniqBy(mappedMatchups, 'hero_id');
           setSynergies([
@@ -142,7 +142,7 @@ function App(props) {
         } else if (team === '1') {
           const mappedMatchups = data[0].vs.map(matchup => ({
             hero_id: matchup.heroId2,
-            winrate: 0.5 - matchup.synergy / 100,
+            winrate: 0.53 - matchup.synergy / 50,
           }));
           const uniqueMappedMatchups = array.uniqBy(mappedMatchups, 'hero_id');
           setCounters([
