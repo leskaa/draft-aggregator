@@ -9,6 +9,7 @@ import './App.css';
 function App(props) {
   const [options, setOptions] = useState([]);
   const [proPickRate, setProPickRate] = useState([]);
+  const [pubPickRate, setPubPickRate] = useState([]);
   const [allies, setAllies] = useState([]);
   const [opponents, setOpponents] = useState([]);
   const [synergies, setSynergies] = useState([]);
@@ -78,20 +79,38 @@ function App(props) {
         team: 'meta',
         winrate: Math.pow(contestedRate / mostContestedRate - 0.5, 3) + 0.55,
       });
+      let heroWinRate = pubPickRate.find(
+        hero => hero.id === teamData[0].matchups[i].heroId
+      );
+      reasonList.push({
+        hero: teamData[0].matchups[i].heroId,
+        name: matchupOptions[i].localized_name,
+        team: 'pub',
+        winrate: heroWinRate === undefined ? 0.5 : heroWinRate.winrate,
+      });
       averageTeamData.push({
         heroId: teamData[0].matchups[i].heroId,
         name: matchupOptions[i].localized_name,
         short_name: matchupOptions[i].short_name,
         winrate:
-          ((total / teamData.length) * 4 +
-            (Math.pow(contestedRate / mostContestedRate - 0.5, 3) + 0.55)) /
-          5,
+          ((total / teamData.length) * 70 +
+            (Math.pow(contestedRate / mostContestedRate - 0.5, 3) + 0.55) * 20 +
+            (heroWinRate === undefined ? 0.5 : heroWinRate.winrate) * 10) /
+          100,
         reasonList: reasonList,
       });
     }
     averageTeamData.sort((a, b) => (a.winrate < b.winrate ? 1 : -1));
     setRecommendations(averageTeamData);
-  }, [allies, counters, opponents, options, proPickRate, synergies]);
+  }, [
+    allies,
+    counters,
+    opponents,
+    options,
+    proPickRate,
+    pubPickRate,
+    synergies,
+  ]);
 
   // TODO: Improve selection option logic
   // https://stackoverflow.com/questions/26137309/remove-selected-option-from-another-select-box
@@ -227,6 +246,26 @@ function App(props) {
         console.log('Stratz API matchups fetch failed: ' + error)
       );
   };
+
+  useEffect(() => {
+    fetch('https://api.stratz.com/api/v1/Hero/winHour')
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error('Non-200 Response');
+        }
+      })
+      .then(data => {
+        setPubPickRate(
+          data.now.slice(0, options.length).map(hero => ({
+            id: hero.heroId,
+            winrate: hero.wins / hero.count,
+          }))
+        );
+      })
+      .catch(error => console.log('Stratz API winHour fetch failed: ' + error));
+  }, [options.length]);
 
   useEffect(() => {
     fetch('https://api.stratz.com/api/v1/Hero')

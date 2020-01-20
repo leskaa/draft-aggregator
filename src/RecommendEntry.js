@@ -75,6 +75,24 @@ const ReasonNotMeta = styled.span`
   color: #5b388f;
 `;
 
+const ReasonPubMeta = styled.span`
+  font-size: 0.35cm;
+  margin: 1em;
+  margin-left: 0.5em;
+  flex: 1;
+  min-width: 11em;
+  color: #64d74a;
+`;
+
+const ReasonNotPubMeta = styled.span`
+  font-size: 0.35cm;
+  margin: 1em;
+  margin-left: 0.5em;
+  flex: 1;
+  min-width: 11em;
+  color: #476291;
+`;
+
 const Winrate = styled.span`
   margin-left: auto;
   order: 3;
@@ -91,6 +109,22 @@ function RecommendEntry(props) {
       <img src={imageURL} alt={props.name}></img>
       <Name>{props.name}</Name>
       {topReasons.map((e, i) => {
+        if (e.team === 'pub') {
+          if (e.winrate > 0.5) {
+            return (
+              <ReasonPubMeta key={i}>
+                Pub <strong>Meta </strong>
+              </ReasonPubMeta>
+            );
+          }
+          return (
+            <ReasonNotPubMeta key={i}>
+              Poor Pub
+              <br />
+              <strong>Winrate </strong>
+            </ReasonNotPubMeta>
+          );
+        }
         if (e.team === 'meta') {
           if (e.winrate > 0.5) {
             return (
