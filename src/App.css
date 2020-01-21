@@ -2,17 +2,17 @@ body{
   background-color: #2F363D;
 }
 .container {
-  padding: 0.25cm;
   background-color: #2F363D;
   display: grid;
   width: 100%;
   height: 100%;
   grid-template-areas:
+    'left config'
     'left top-right'
     'left bottom-right'
     'bottom-bar bottom-bar';
   grid-template-columns: 3fr 2fr;
-  grid-template-rows: 3fr 3fr 1fr;
+  grid-template-rows: 1.5fr 3fr 3fr 0.5fr;
 }
 .container > div {
   border: 5px solid #B44335;
@@ -25,22 +25,28 @@ body{
 
 .left {
   grid-area: left;
-  height: 75vh;
+  height: 80vh;
   overflow: hidden;
   overflow-y: scroll;
 }
+.config {
+  grid-area: config;
+  margin: 1rem;
+  padding-top: 0.5rem;
+} 
 .top-right {
   grid-area: top-right;
   margin: 1rem;
-  padding-top: 0.75rem;
+  padding-top: 0.5rem;
 } 
 .bottom-right {
   grid-area: bottom-right;
   margin: 1rem;
-  padding-top: 0.75rem;
+  padding-top: 0.5rem;
 }
 .bottom-bar {
   grid-area: bottom-bar;
+  margin: 1rem;
 }
 
 .header {

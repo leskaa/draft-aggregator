@@ -3,6 +3,7 @@ import array from 'lodash/array';
 
 import HeroSelector from './HeroSelector.js';
 import RecommendPanel from './RecommendPanel.js';
+import ConfigPanel from './ConfigPanel.js';
 
 import './App.css';
 
@@ -15,6 +16,7 @@ function App(props) {
   const [synergies, setSynergies] = useState([]);
   const [counters, setCounters] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
+  const [weightConfigs, setWeightConfigs] = useState([80, 10, 10]);
 
   useEffect(() => {
     let teamData = [...counters, ...synergies];
@@ -73,29 +75,37 @@ function App(props) {
         hero => hero.id === teamData[0].matchups[i].heroId
       );
       let contestedRate = heroPickRate.picks + heroPickRate.bans;
+      let contestedPercent =
+        (contestedRate / mostContestedRate - 0.5) / 3 + 0.6;
+      if (contestedPercent > 0.55) {
+        contestedPercent = contestedPercent - (contestedPercent - 0.55) / 1.25;
+      } else if (contestedPercent < 0.45) {
+        contestedPercent = contestedPercent + (0.45 - contestedPercent) / 1.25;
+      }
       reasonList.push({
         hero: teamData[0].matchups[i].heroId,
         name: matchupOptions[i].localized_name,
         team: 'meta',
-        winrate: Math.pow(contestedRate / mostContestedRate - 0.5, 3) + 0.55,
+        winrate: contestedPercent,
       });
       let heroWinRate = pubPickRate.find(
         hero => hero.id === teamData[0].matchups[i].heroId
       );
+      heroWinRate = heroWinRate === undefined ? 0.5 : heroWinRate.winrate;
       reasonList.push({
         hero: teamData[0].matchups[i].heroId,
         name: matchupOptions[i].localized_name,
         team: 'pub',
-        winrate: heroWinRate === undefined ? 0.5 : heroWinRate.winrate,
+        winrate: heroWinRate,
       });
       averageTeamData.push({
         heroId: teamData[0].matchups[i].heroId,
         name: matchupOptions[i].localized_name,
         short_name: matchupOptions[i].short_name,
         winrate:
-          ((total / teamData.length) * 70 +
-            (Math.pow(contestedRate / mostContestedRate - 0.5, 3) + 0.55) * 20 +
-            (heroWinRate === undefined ? 0.5 : heroWinRate.winrate) * 10) /
+          ((total / teamData.length) * weightConfigs[0] +
+            contestedPercent * weightConfigs[1] +
+            heroWinRate * weightConfigs[2]) /
           100,
         reasonList: reasonList,
       });
@@ -110,6 +120,7 @@ function App(props) {
     proPickRate,
     pubPickRate,
     synergies,
+    weightConfigs,
   ]);
 
   // TODO: Improve selection option logic
@@ -134,7 +145,7 @@ function App(props) {
     // TODO: Using Stratz API
     Promise.all([
       fetch(
-        `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=0,1,2,3,4,5,6,7,8&matchLimit=0&week=2607`
+        `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=4,5,6,7,8&matchLimit=0&week=2607`
       ).then(response => {
         if (response.ok) {
           return response.json();
@@ -143,7 +154,7 @@ function App(props) {
         }
       }),
       fetch(
-        `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=0,1,2,3,4,5,6,7,8&matchLimit=0&week=2608`
+        `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=4,5,6,7,8&matchLimit=0&week=2608`
       ).then(response => {
         if (response.ok) {
           return response.json();
@@ -152,7 +163,7 @@ function App(props) {
         }
       }),
       fetch(
-        `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=0,1,2,3,4,5,6,7,8&matchLimit=0&week=2609`
+        `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=4,5,6,7,8&matchLimit=0&week=2609`
       ).then(response => {
         if (response.ok) {
           return response.json();
@@ -161,7 +172,7 @@ function App(props) {
         }
       }),
       fetch(
-        `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=0,1,2,3,4,5,6,7,8&matchLimit=0&week=2610`
+        `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=4,5,6,7,8&matchLimit=0&week=2610`
       ).then(response => {
         if (response.ok) {
           return response.json();
@@ -170,7 +181,7 @@ function App(props) {
         }
       }),
       fetch(
-        `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=0,1,2,3,4,5,6,7,8&matchLimit=0`
+        `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=4,5,6,7,8&matchLimit=0`
       ).then(response => {
         if (response.ok) {
           return response.json();
@@ -197,9 +208,7 @@ function App(props) {
                   with3[i].synergy +
                   with4[i].synergy +
                   with5[i].synergy) /
-                  500 /
-                  // Slightly lower weight than counters
-                  1.5,
+                  500,
             });
           }
           const uniqueMappedMatchups = array.uniqBy(mappedMatchups, 'hero_id');
@@ -313,6 +322,10 @@ function App(props) {
       );
   }, []);
 
+  const handleConfigChange = (counterWeight, proWeight, pubWeight) => {
+    setWeightConfigs([counterWeight, proWeight, pubWeight]);
+  };
+
   return (
     <div>
       <div className="header">
@@ -321,6 +334,10 @@ function App(props) {
         </h1>
       </div>
       <div className="container">
+        <div className="config">
+          <p className="team-title">Configure Weights</p>
+          <ConfigPanel onChange={handleConfigChange} />
+        </div>
         <div className="top-right">
           <p className="team-title">Allies</p>
           {[...Array(5)].map((e, i) => (

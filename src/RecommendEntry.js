@@ -102,7 +102,7 @@ function RecommendEntry(props) {
   let imageURL = `http://cdn.dota2.com/apps/dota2/images/heroes/${props.imageName}_sb.png`;
   let topReasons = props.reasonList
     .sort((a, b) => Math.abs(b.winrate - 0.5) - Math.abs(a.winrate - 0.5))
-    .filter(reason => Math.abs(reason.winrate - 0.5) > 0.025)
+    .filter(reason => Math.abs(reason.winrate - 0.5) > 0.04)
     .slice(0, 2);
   return (
     <NameList key={props.heroId}>
