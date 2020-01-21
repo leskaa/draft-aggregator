@@ -57,20 +57,28 @@ function App(props) {
     for (let i = 0; i < matchupOptions.length; i++) {
       let total = 0;
       let reasonList = [];
-      teamData.forEach(matchupSet => {
-        total += matchupSet.matchups[i].winrate;
-        reasonList.push({
-          hero: matchupSet.hero,
-          name: options.filter(option => option.id === matchupSet.hero)[0]
-            .localized_name,
-          team:
+      if (weightConfigs[0] > 0) {
+        teamData.forEach(matchupSet => {
+          let team =
             counters.filter(counter => counter.hero === matchupSet.hero)
               .length > 0
               ? 'counter'
-              : 'synergy',
-          winrate: matchupSet.matchups[i].winrate,
+              : 'synergy';
+          let winrate = matchupSet.matchups[i].winrate;
+          if (team === 'synergy') {
+            total += (winrate - 0.5) / 2 + 0.5;
+          } else {
+            total += winrate;
+          }
+          reasonList.push({
+            hero: matchupSet.hero,
+            name: options.filter(option => option.id === matchupSet.hero)[0]
+              .localized_name,
+            team: team,
+            winrate: winrate,
+          });
         });
-      });
+      }
       let heroPickRate = proPickRate.find(
         hero => hero.id === teamData[0].matchups[i].heroId
       );
@@ -82,22 +90,26 @@ function App(props) {
       } else if (contestedPercent < 0.45) {
         contestedPercent = contestedPercent + (0.45 - contestedPercent) / 1.25;
       }
-      reasonList.push({
-        hero: teamData[0].matchups[i].heroId,
-        name: matchupOptions[i].localized_name,
-        team: 'meta',
-        winrate: contestedPercent,
-      });
+      if (weightConfigs[1] > 0) {
+        reasonList.push({
+          hero: teamData[0].matchups[i].heroId,
+          name: matchupOptions[i].localized_name,
+          team: 'meta',
+          winrate: contestedPercent,
+        });
+      }
       let heroWinRate = pubPickRate.find(
         hero => hero.id === teamData[0].matchups[i].heroId
       );
       heroWinRate = heroWinRate === undefined ? 0.5 : heroWinRate.winrate;
-      reasonList.push({
-        hero: teamData[0].matchups[i].heroId,
-        name: matchupOptions[i].localized_name,
-        team: 'pub',
-        winrate: heroWinRate,
-      });
+      if (weightConfigs[2] > 0) {
+        reasonList.push({
+          hero: teamData[0].matchups[i].heroId,
+          name: matchupOptions[i].localized_name,
+          team: 'pub',
+          winrate: heroWinRate,
+        });
+      }
       averageTeamData.push({
         heroId: teamData[0].matchups[i].heroId,
         name: matchupOptions[i].localized_name,

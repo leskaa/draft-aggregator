@@ -177,7 +177,7 @@ function RecommendEntry(props) {
         }
         return (
           <ReasonAntiSynergy key={i}>
-            Synergy <br />
+            Anti-Synergy <br />
             <strong>{e.name}</strong>
           </ReasonAntiSynergy>
         );
