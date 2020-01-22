@@ -36,10 +36,12 @@ function HeroSelector(props) {
   const [selected, setSelected] = useState(null);
 
   const handleChange = selection => {
-    if (selected) {
+    if (selected && !selection) {
       props.removeFromTeam(selected.value, props.team);
-    } else if (selection) {
-      props.addToTeam(selection.value, props.team);
+    } else if (selected && selection) {
+      props.addToTeam(selection.value, props.team, selected.value);
+    } else if (!selected && selection) {
+      props.addToTeam(selection.value, props.team, -1);
     }
     setSelected(selection);
   };

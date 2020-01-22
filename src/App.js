@@ -11,8 +11,6 @@ function App(props) {
   const [options, setOptions] = useState([]);
   const [proPickRate, setProPickRate] = useState([]);
   const [pubPickRate, setPubPickRate] = useState([]);
-  const [allies, setAllies] = useState([]);
-  const [opponents, setOpponents] = useState([]);
   const [synergies, setSynergies] = useState([]);
   const [counters, setCounters] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
@@ -34,8 +32,8 @@ function App(props) {
     }));
     // Remove already picked heroes from matchup data
     let pickedHeroes = [];
-    allies.forEach(hero => pickedHeroes.push(hero));
-    opponents.forEach(hero => pickedHeroes.push(hero));
+    synergies.forEach(matchups => pickedHeroes.push(matchups.hero));
+    counters.forEach(matchups => pickedHeroes.push(matchups.hero));
     teamData.forEach(matchupSet => {
       matchupSet.matchups = matchupSet.matchups.filter(option => {
         return !pickedHeroes.includes(option.heroId) ? true : false;
@@ -124,36 +122,20 @@ function App(props) {
     }
     averageTeamData.sort((a, b) => (a.winrate < b.winrate ? 1 : -1));
     setRecommendations(averageTeamData);
-  }, [
-    allies,
-    counters,
-    opponents,
-    options,
-    proPickRate,
-    pubPickRate,
-    synergies,
-    weightConfigs,
-  ]);
+  }, [counters, options, proPickRate, pubPickRate, synergies, weightConfigs]);
 
   // TODO: Improve selection option logic
   // https://stackoverflow.com/questions/26137309/remove-selected-option-from-another-select-box
   const removeFromTeam = (heroId, team) => {
     if (team === '0') {
-      setAllies(allies.filter(ally => ally !== heroId));
       setSynergies(synergies.filter(matchupSet => matchupSet.hero !== heroId));
     } else if (team === '1') {
-      setOpponents(opponents.filter(opponent => opponent !== heroId));
       setCounters(counters.filter(matchupSet => matchupSet.hero !== heroId));
     }
   };
 
   // TODO: Add loading to deal with api delay
-  const addToTeam = (heroId, team) => {
-    if (team === '0') {
-      setAllies([...allies, heroId]);
-    } else if (team === '1') {
-      setOpponents([...opponents, heroId]);
-    }
+  const addToTeam = (heroId, team, remove) => {
     // TODO: Using Stratz API
     Promise.all([
       fetch(
@@ -225,7 +207,7 @@ function App(props) {
           }
           const uniqueMappedMatchups = array.uniqBy(mappedMatchups, 'hero_id');
           setSynergies([
-            ...synergies,
+            ...synergies.filter(matchupSet => matchupSet.hero !== remove),
             {
               hero: heroId,
               team: team,
@@ -254,7 +236,7 @@ function App(props) {
           }
           const uniqueMappedMatchups = array.uniqBy(mappedMatchups, 'hero_id');
           setCounters([
-            ...counters,
+            ...counters.filter(matchupSet => matchupSet.hero !== remove),
             {
               hero: heroId,
               team: team,
