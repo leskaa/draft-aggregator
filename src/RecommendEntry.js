@@ -9,6 +9,7 @@ Modal.setAppElement('#root');
 const modalStyles = {
   overlay: {
     backgroundColor: 'rgba(47, 54, 61, 0.75)',
+    zIndex: '10',
   },
   content: {
     color: '#fefefe',
@@ -20,6 +21,7 @@ const modalStyles = {
     bottom: 'auto',
     marginRight: '-50%',
     transform: 'translate(-50%, -50%)',
+    zIndex: '10',
   },
 };
 
@@ -35,6 +37,15 @@ const NameList = styled.li`
   display: flex;
   flex-direction: row;
   align-items: center;
+
+  &:hover {
+    position: relative;
+    border-bottom: 5px solid;
+    margin-bottom: -5px;
+    border-color: #41484e;
+    z-index: 5;
+    position: relative;
+  }
 `;
 
 const Name = styled.div`
