@@ -7,7 +7,7 @@ function BreakdownInfo(props) {
       <h2>{props.hero}</h2>
       {reasonList.map((e, i) => {
         return (
-          <div>
+          <div key={i}>
             {e.team === 'counter' && e.winrate >= 0.5
               ? 'Counters ' + e.name + ': '
               : ''}
