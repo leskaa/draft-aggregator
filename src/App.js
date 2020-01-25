@@ -206,13 +206,6 @@ function App(props) {
             });
           }
           const uniqueMappedMatchups = array.uniqBy(mappedMatchups, 'hero_id');
-          // const matchupAdjustmentValue =
-          //   uniqueMappedMatchups.reduce((a, b) => a + b.winrate, 0) /
-          //   uniqueMappedMatchups.length;
-          // const adjustedUniqueMatchups = uniqueMappedMatchups.map(matchup => ({
-          //   hero_id: matchup.hero_id,
-          //   winrate: matchup.winrate - matchupAdjustmentValue + 0.5,
-          // }));
           setSynergies([
             ...synergies.filter(matchupSet => matchupSet.hero !== remove),
             {
