@@ -248,6 +248,29 @@ function App(props) {
       .catch(error =>
         console.log('Stratz API matchups fetch failed: ' + error)
       );
+
+    // fetch(`https://api.opendota.com/api/heroes/${heroId}/matchups`)
+    //   .then(response => {
+    //     if (response.ok) {
+    //       return response.json();
+    //     } else {
+    //       throw new Error('Non-200 Response');
+    //     }
+    //   })
+    //   .then(data => {
+    //     const newData = data.sort((a, b) => a.hero_id - b.hero_id);
+    //     console.log(newData);
+    //     let mappedMatchups = [];
+    //     for (let i = 0; i < data.length; i++) {
+    //       mappedMatchups.push({
+    //         hero_id: data[i].hero_id,
+    //         winrate:
+    //       });
+    //     }
+    //   })
+    //   .catch(error =>
+    //     console.log('OpenDota API matchups fetch failed: ' + error)
+    //   );
   };
 
   useEffect(() => {
