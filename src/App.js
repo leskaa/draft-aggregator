@@ -137,55 +137,55 @@ function App(props) {
   // TODO: Add loading to deal with api delay
   const addToTeam = (heroId, team, remove) => {
     // TODO: Using Stratz API
-    Promise.all([
-      fetch(
-        `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=4,5,6,7,8&matchLimit=0&week=2608`
-      ).then(response => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new Error('Non-200 Response');
-        }
-      }),
-      fetch(
-        `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=4,5,6,7,8&matchLimit=0&week=2609`
-      ).then(response => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new Error('Non-200 Response');
-        }
-      }),
-      fetch(
-        `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=4,5,6,7,8&matchLimit=0&week=2610`
-      ).then(response => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new Error('Non-200 Response');
-        }
-      }),
-      fetch(
-        `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=4,5,6,7,8&matchLimit=0&week=2611`
-      ).then(response => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new Error('Non-200 Response');
-        }
-      }),
-      fetch(
-        `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=4,5,6,7,8&matchLimit=0`
-      ).then(response => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new Error('Non-200 Response');
-        }
-      }),
-    ])
-      .then(([data, data2, data3, data4, data5]) => {
-        if (team === '0') {
+    if (team === '0') {
+      Promise.all([
+        fetch(
+          `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=4,5,6,7,8&matchLimit=0&week=2608`
+        ).then(response => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error('Non-200 Response');
+          }
+        }),
+        fetch(
+          `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=4,5,6,7,8&matchLimit=0&week=2609`
+        ).then(response => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error('Non-200 Response');
+          }
+        }),
+        fetch(
+          `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=4,5,6,7,8&matchLimit=0&week=2610`
+        ).then(response => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error('Non-200 Response');
+          }
+        }),
+        fetch(
+          `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=4,5,6,7,8&matchLimit=0&week=2611`
+        ).then(response => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error('Non-200 Response');
+          }
+        }),
+        fetch(
+          `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=4,5,6,7,8&matchLimit=0`
+        ).then(response => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error('Non-200 Response');
+          }
+        }),
+      ])
+        .then(([data, data2, data3, data4, data5]) => {
           const with1 = data[0].with.sort((a, b) => a.id - b.id);
           const with2 = data2[0].with.sort((a, b) => a.id - b.id);
           const with3 = data3[0].with.sort((a, b) => a.id - b.id);
@@ -214,24 +214,29 @@ function App(props) {
               matchups: uniqueMappedMatchups,
             },
           ]);
-        } else if (team === '1') {
-          const vs1 = data[0].vs.sort((a, b) => a.id - b.id);
-          const vs2 = data2[0].vs.sort((a, b) => a.id - b.id);
-          const vs3 = data3[0].vs.sort((a, b) => a.id - b.id);
-          const vs4 = data4[0].vs.sort((a, b) => a.id - b.id);
-          const vs5 = data5[0].vs.sort((a, b) => a.id - b.id);
+        })
+        .catch(error =>
+          console.log('Stratz API matchups fetch failed: ' + error)
+        );
+    }
+
+    if (team === '1') {
+      fetch(`https://api.opendota.com/api/heroes/${heroId}/matchups`)
+        .then(response => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error('Non-200 Response');
+          }
+        })
+        .then(data => {
+          const newData = data.sort((a, b) => a.hero_id - b.hero_id);
+          console.log(newData);
           let mappedMatchups = [];
-          for (let i = 0; i < data[0].vs.length; i++) {
+          for (let i = 0; i < data.length; i++) {
             mappedMatchups.push({
-              hero_id: vs1[i].heroId2,
-              winrate:
-                0.5 -
-                (vs1[i].synergy +
-                  vs2[i].synergy +
-                  vs3[i].synergy +
-                  vs4[i].synergy +
-                  vs5[i].synergy) /
-                  500,
+              hero_id: data[i].hero_id,
+              winrate: 1 - data[i].wins / data[i].games_played,
             });
           }
           const uniqueMappedMatchups = array.uniqBy(mappedMatchups, 'hero_id');
@@ -243,34 +248,11 @@ function App(props) {
               matchups: uniqueMappedMatchups,
             },
           ]);
-        }
-      })
-      .catch(error =>
-        console.log('Stratz API matchups fetch failed: ' + error)
-      );
-
-    // fetch(`https://api.opendota.com/api/heroes/${heroId}/matchups`)
-    //   .then(response => {
-    //     if (response.ok) {
-    //       return response.json();
-    //     } else {
-    //       throw new Error('Non-200 Response');
-    //     }
-    //   })
-    //   .then(data => {
-    //     const newData = data.sort((a, b) => a.hero_id - b.hero_id);
-    //     console.log(newData);
-    //     let mappedMatchups = [];
-    //     for (let i = 0; i < data.length; i++) {
-    //       mappedMatchups.push({
-    //         hero_id: data[i].hero_id,
-    //         winrate:
-    //       });
-    //     }
-    //   })
-    //   .catch(error =>
-    //     console.log('OpenDota API matchups fetch failed: ' + error)
-    //   );
+        })
+        .catch(error =>
+          console.log('OpenDota API matchups fetch failed: ' + error)
+        );
+    }
   };
 
   useEffect(() => {
