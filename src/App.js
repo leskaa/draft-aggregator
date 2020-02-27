@@ -5,6 +5,8 @@ import HeroSelector from './HeroSelector.js';
 import RecommendPanel from './RecommendPanel.js';
 import ConfigPanel from './ConfigPanel.js';
 
+import counterData from './counter_data.json';
+
 import './App.css';
 
 function App(props) {
@@ -221,37 +223,25 @@ function App(props) {
     }
 
     if (team === '1') {
-      fetch(`https://api.opendota.com/api/heroes/${heroId}/matchups`)
-        .then(response => {
-          if (response.ok) {
-            return response.json();
-          } else {
-            throw new Error('Non-200 Response');
-          }
-        })
-        .then(data => {
-          const newData = data.sort((a, b) => a.hero_id - b.hero_id);
-          console.log(newData);
-          let mappedMatchups = [];
-          for (let i = 0; i < data.length; i++) {
-            mappedMatchups.push({
-              hero_id: data[i].hero_id,
-              winrate: 1 - data[i].wins / data[i].games_played,
-            });
-          }
-          const uniqueMappedMatchups = array.uniqBy(mappedMatchups, 'hero_id');
-          setCounters([
-            ...counters.filter(matchupSet => matchupSet.hero !== remove),
-            {
-              hero: heroId,
-              team: team,
-              matchups: uniqueMappedMatchups,
-            },
-          ]);
-        })
-        .catch(error =>
-          console.log('OpenDota API matchups fetch failed: ' + error)
-        );
+      const data = counterData
+        .filter(matchup => matchup.hero === heroId)
+        .sort((a, b) => a.againstHero - b.againstHero);
+      let mappedMatchups = [];
+      for (let i = 0; i < data.length; i++) {
+        mappedMatchups.push({
+          hero_id: data[i].againstHero,
+          winrate: 0.5 + data[i].shift,
+        });
+      }
+      const uniqueMappedMatchups = array.uniqBy(mappedMatchups, 'hero_id');
+      setCounters([
+        ...counters.filter(matchupSet => matchupSet.hero !== remove),
+        {
+          hero: heroId,
+          team: team,
+          matchups: uniqueMappedMatchups,
+        },
+      ]);
     }
   };
 
