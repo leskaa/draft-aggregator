@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import array from 'lodash/array';
+import { uniqBy } from 'lodash';
 
 import HeroSelector from './HeroSelector.js';
 import RecommendPanel from './RecommendPanel.js';
@@ -207,7 +207,7 @@ function App(props) {
                   500,
             });
           }
-          const uniqueMappedMatchups = array.uniqBy(mappedMatchups, 'hero_id');
+          const uniqueMappedMatchups = uniqBy(mappedMatchups, 'hero_id');
           setSynergies([
             ...synergies.filter(matchupSet => matchupSet.hero !== remove),
             {
@@ -233,7 +233,7 @@ function App(props) {
           winrate: 0.5 + data[i].shift,
         });
       }
-      const uniqueMappedMatchups = array.uniqBy(mappedMatchups, 'hero_id');
+      const uniqueMappedMatchups = uniqBy(mappedMatchups, 'hero_id');
       setCounters([
         ...counters.filter(matchupSet => matchupSet.hero !== remove),
         {
