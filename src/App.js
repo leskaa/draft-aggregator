@@ -227,12 +227,21 @@ function App(props) {
         .filter(matchup => matchup.hero === heroId)
         .sort((a, b) => a.againstHero - b.againstHero);
       let mappedMatchups = [];
-      for (let i = 0; i < data.length; i++) {
-        mappedMatchups.push({
-          hero_id: data[i].againstHero,
-          winrate: 0.5 + data[i].shift,
-        });
-      }
+      let index = 0;
+      options.forEach(option => {
+        if (data[index]?.againstHero === option.id) {
+          mappedMatchups.push({
+            hero_id: data[index].againstHero,
+            winrate: 0.5 - data[index]?.shift / 100,
+          });
+          index++;
+        } else if (option.id !== heroId) {
+          mappedMatchups.push({
+            hero_id: option.id,
+            winrate: 0.5,
+          });
+        }
+      });
       const uniqueMappedMatchups = uniqBy(mappedMatchups, 'hero_id');
       setCounters([
         ...counters.filter(matchupSet => matchupSet.hero !== remove),
