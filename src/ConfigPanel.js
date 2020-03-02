@@ -58,9 +58,9 @@ const FlexContainer = styled.div`
 `;
 
 function ConfigPanel(props) {
-  const [counterWeight, setCounterWeight] = useState(80);
-  const [proWeight, setProWeight] = useState(10);
-  const [pubWeight, setPubWeight] = useState(10);
+  const [counterWeight, setCounterWeight] = useState(60);
+  const [proWeight, setProWeight] = useState(20);
+  const [pubWeight, setPubWeight] = useState(20);
 
   const handleChange = event => {
     props.onChange(event[0], event[1] - event[0], 100 - event[1]);
@@ -72,7 +72,7 @@ function ConfigPanel(props) {
   return (
     <div>
       <StyledSlider
-        defaultValue={[80, 90]}
+        defaultValue={[counterWeight, counterWeight + proWeight]}
         renderTrack={Track}
         renderThumb={Thumb}
         onAfterChange={handleChange}

@@ -5,8 +5,6 @@ import HeroSelector from './HeroSelector.js';
 import RecommendPanel from './RecommendPanel.js';
 import ConfigPanel from './ConfigPanel.js';
 
-import counterData from './counter_data.json';
-
 import './App.css';
 
 function App(props) {
@@ -16,7 +14,7 @@ function App(props) {
   const [synergies, setSynergies] = useState([]);
   const [counters, setCounters] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
-  const [weightConfigs, setWeightConfigs] = useState([80, 10, 10]);
+  const [weightConfigs, setWeightConfigs] = useState([60, 20, 20]);
 
   useEffect(() => {
     let teamData = [...counters, ...synergies];
@@ -65,11 +63,7 @@ function App(props) {
               ? 'counter'
               : 'synergy';
           let winrate = matchupSet.matchups[i].winrate;
-          if (team === 'synergy') {
-            total += (winrate - 0.5) / 2 + 0.5;
-          } else {
-            total += winrate;
-          }
+          total += winrate;
           reasonList.push({
             hero: matchupSet.hero,
             name: options.filter(option => option.id === matchupSet.hero)[0]
@@ -142,33 +136,6 @@ function App(props) {
     if (team === '0') {
       Promise.all([
         fetch(
-          `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=4,5,6,7,8&matchLimit=0&week=2608`
-        ).then(response => {
-          if (response.ok) {
-            return response.json();
-          } else {
-            throw new Error('Non-200 Response');
-          }
-        }),
-        fetch(
-          `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=4,5,6,7,8&matchLimit=0&week=2609`
-        ).then(response => {
-          if (response.ok) {
-            return response.json();
-          } else {
-            throw new Error('Non-200 Response');
-          }
-        }),
-        fetch(
-          `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=4,5,6,7,8&matchLimit=0&week=2610`
-        ).then(response => {
-          if (response.ok) {
-            return response.json();
-          } else {
-            throw new Error('Non-200 Response');
-          }
-        }),
-        fetch(
           `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=4,5,6,7,8&matchLimit=0&week=2611`
         ).then(response => {
           if (response.ok) {
@@ -187,24 +154,15 @@ function App(props) {
           }
         }),
       ])
-        .then(([data, data2, data3, data4, data5]) => {
-          const with1 = data[0].with.sort((a, b) => a.id - b.id);
-          const with2 = data2[0].with.sort((a, b) => a.id - b.id);
-          const with3 = data3[0].with.sort((a, b) => a.id - b.id);
-          const with4 = data4[0].with.sort((a, b) => a.id - b.id);
-          const with5 = data5[0].with.sort((a, b) => a.id - b.id);
+        .then(([currentData, oldData]) => {
+          const currentWith = currentData[0].with.sort((a, b) => a.id - b.id);
+          const oldWith = oldData[0].with.sort((a, b) => a.id - b.id);
           let mappedMatchups = [];
-          for (let i = 0; i < data[0].with.length; i++) {
+          for (let i = 0; i < currentData[0].with.length; i++) {
             mappedMatchups.push({
-              hero_id: with1[i].heroId2,
+              hero_id: currentWith[i].heroId2,
               winrate:
-                0.5 +
-                (with1[i].synergy +
-                  with2[i].synergy +
-                  with3[i].synergy +
-                  with4[i].synergy +
-                  with5[i].synergy) /
-                  500,
+                0.5 + (currentWith[i].synergy + oldWith[i].synergy) / 200,
             });
           }
           const uniqueMappedMatchups = uniqBy(mappedMatchups, 'hero_id');
@@ -223,34 +181,48 @@ function App(props) {
     }
 
     if (team === '1') {
-      const data = counterData
-        .filter(matchup => matchup.hero === heroId)
-        .sort((a, b) => a.againstHero - b.againstHero);
-      let mappedMatchups = [];
-      let index = 0;
-      options.forEach(option => {
-        if (data[index]?.againstHero === option.id) {
-          mappedMatchups.push({
-            hero_id: data[index].againstHero,
-            winrate: 0.5 - data[index]?.shift / 100,
+      fetch(`https://api.opendota.com/api/heroes/${heroId}/matchups`)
+        .then(response => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw new Error('Non-200 Response');
+          }
+        })
+        .then(counterData => {
+          const data = counterData.sort((a, b) => a.hero_id - b.hero_id);
+          let mappedMatchups = [];
+          let index = 0;
+          options.forEach(option => {
+            if (data[index]?.hero_id === option.id) {
+              mappedMatchups.push({
+                hero_id: data[index].hero_id,
+                winrate:
+                  1 -
+                  ((data[index].wins / data[index].games_played - 0.5) / 3 +
+                    0.5),
+              });
+              index++;
+            } else if (option.id !== heroId) {
+              mappedMatchups.push({
+                hero_id: option.id,
+                winrate: 0.5,
+              });
+            }
           });
-          index++;
-        } else if (option.id !== heroId) {
-          mappedMatchups.push({
-            hero_id: option.id,
-            winrate: 0.5,
-          });
-        }
-      });
-      const uniqueMappedMatchups = uniqBy(mappedMatchups, 'hero_id');
-      setCounters([
-        ...counters.filter(matchupSet => matchupSet.hero !== remove),
-        {
-          hero: heroId,
-          team: team,
-          matchups: uniqueMappedMatchups,
-        },
-      ]);
+          const uniqueMappedMatchups = uniqBy(mappedMatchups, 'hero_id');
+          setCounters([
+            ...counters.filter(matchupSet => matchupSet.hero !== remove),
+            {
+              hero: heroId,
+              team: team,
+              matchups: uniqueMappedMatchups,
+            },
+          ]);
+        })
+        .catch(error =>
+          console.log('OpenDota API matchups fetch failed: ' + error)
+        );
     }
   };
 
