@@ -60,6 +60,9 @@ const Reason = styled.span`
   margin-left: 0.5em;
   flex: 1;
   min-width: 11em;
+  @media screen and (max-width: 1080px) {
+    display: none;
+  }
 `;
 
 const ReasonCounters = styled(Reason)`

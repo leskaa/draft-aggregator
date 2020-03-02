@@ -335,6 +335,12 @@ function App(props) {
         <div className="left">
           <RecommendPanel recommendations={recommendations}></RecommendPanel>
         </div>
+        <div className="bottom-bar">
+          <h3>
+            © {new Date().getFullYear()}{' '}
+            <a href="https://github.com/leskaa">@leskaa</a>
+          </h3>
+        </div>
       </div>
     </div>
   );
