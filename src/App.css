@@ -59,6 +59,7 @@ a:active {
   grid-area: bottom-right;
   margin: 0.75rem;
   margin-top: 0em;
+  margin-bottom: 0em;
   padding-top: 0.25rem;
   border: 5px solid #a52a2a;
   background-color: #1b1e21;
@@ -130,5 +131,8 @@ a:active {
   .left {
     margin-right: 1em;
     font-size: 75%;
+  }
+  .bottom-right {
+    margin-bottom: 0.75em;
   }
 }
