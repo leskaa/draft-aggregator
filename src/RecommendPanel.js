@@ -3,8 +3,9 @@ import styled from 'styled-components';
 import RecommendEntry from './RecommendEntry';
 
 const RecommendationsList = styled.ul`
-  margin-left: -38px;
-  margin-top: 1px;
+  margin-left: -40px;
+  margin-top: 0px;
+  margin-bottom: 0px;
   background: #1b1e21;
   color: #fefefe;
   list-style-type: none;

@@ -29,7 +29,8 @@ const NameList = styled.li`
   font-family: 'Gothic A1', sans-serif;
   font-size: 1.75em;
   border: 5px solid;
-  border-bottom: 0px solid;
+  border-bottom: 5px solid;
+  margin-bottom: -5px;
   border-color: #2f363d;
   box-decoration-break: clone;
   list-style-type: none;
@@ -40,8 +41,6 @@ const NameList = styled.li`
 
   &:hover {
     position: relative;
-    border-bottom: 5px solid;
-    margin-bottom: -5px;
     border-color: #41484e;
     z-index: 5;
     position: relative;
