@@ -198,9 +198,12 @@ function App(props) {
               mappedMatchups.push({
                 hero_id: data[index].hero_id,
                 winrate:
-                  1 -
-                  ((data[index].wins / data[index].games_played - 0.5) / 3 +
-                    0.5),
+                  data[index].games_played > 9
+                    ? (option.base_winrate -
+                        data[index].wins / data[index].games_played) /
+                        4 +
+                      0.5
+                    : 0.5,
               });
               index++;
             } else if (option.id !== heroId) {
@@ -247,7 +250,7 @@ function App(props) {
   }, [options.length]);
 
   useEffect(() => {
-    fetch('https://api.stratz.com/api/v1/Hero')
+    fetch('https://api.opendota.com/api/heroStats')
       .then(response => {
         if (response.ok) {
           return response.json();
@@ -259,8 +262,10 @@ function App(props) {
         setOptions(
           Object.values(data).map(option => ({
             id: option.id,
-            localized_name: option.displayName,
-            short_name: option.shortName,
+            localized_name: option.localized_name,
+            short_name: option.name.substring(14),
+            base_winrate:
+              option.pro_pick > 10 ? option.pro_win / option.pro_pick : 0.5,
           }))
         );
       })

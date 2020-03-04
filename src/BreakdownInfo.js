@@ -8,8 +8,11 @@ function BreakdownInfo(props) {
       {reasonList.map((e, i) => {
         return (
           <div key={i}>
-            {e.team === 'counter' && e.winrate >= 0.5
+            {e.team === 'counter' && e.winrate > 0.5
               ? 'Counters ' + e.name + ': '
+              : ''}
+            {e.team === 'counter' && e.winrate === 0.5
+              ? 'Limited Data Against ' + e.name + ': '
               : ''}
             {e.team === 'counter' && e.winrate < 0.5
               ? 'Countered By ' + e.name + ': '
