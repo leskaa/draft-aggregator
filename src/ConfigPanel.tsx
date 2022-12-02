@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 import ReactSlider from 'react-slider';
 
 const StyledSlider = styled(ReactSlider)`
@@ -20,19 +20,19 @@ const StyledThumb = styled.div`
   cursor: grab;
 `;
 
-const Thumb = (props, state) => (
+const Thumb = (props: any, state: any) => (
   <StyledThumb {...props}>{state.valueNow}</StyledThumb>
 );
 
 const StyledTrack = styled.div`
   top: 0;
   bottom: 0;
-  background: ${props =>
+  background: ${(props: any) =>
     props.index === 2 ? '#64d74a' : props.index === 1 ? '#daa520' : '#167c13'};
   border-radius: 999px;
 `;
 
-const Track = (props, state) => <StyledTrack {...props} index={state.index} />;
+const Track = (props: any, state: any) => <StyledTrack {...props} index={state.index} />;
 
 const ReasonCounters = styled.span`
   font-size: 1rem;
@@ -57,16 +57,22 @@ const FlexContainer = styled.div`
   margin-top: 0em;
 `;
 
-function ConfigPanel(props) {
+type ConfigPanelProps = {
+  onChange: (reasonCounters: number, reasonMeta: number, reasonPubMeta: number) => void;
+};
+
+function ConfigPanel(props: ConfigPanelProps) {
   const [counterWeight, setCounterWeight] = useState(60);
   const [proWeight, setProWeight] = useState(20);
   const [pubWeight, setPubWeight] = useState(20);
 
-  const handleChange = event => {
-    props.onChange(event[0], event[1] - event[0], 100 - event[1]);
-    setCounterWeight(event[0]);
-    setProWeight(event[1] - event[0]);
-    setPubWeight(100 - event[1]);
+  const handleChange = (value: number | readonly number[]): void => {
+    if (Array.isArray(value)) {
+      props.onChange(value[0], value[1] - value[0], 100 - value[1]);
+      setCounterWeight(value[0]);
+      setProWeight(value[1] - value[0]);
+      setPubWeight(100 - value[1]);
+    }
   };
 
   return (

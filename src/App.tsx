@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { uniqBy } from 'lodash';
 
-import HeroSelector from './HeroSelector.js';
-import RecommendPanel from './RecommendPanel.js';
-import ConfigPanel from './ConfigPanel.js';
+import { uniqBy } from './uniqBy';
+import HeroSelector from './HeroSelector';
+import RecommendPanel from './RecommendPanel';
+import ConfigPanel from './ConfigPanel';
 
 import './App.css';
 
-function App(props) {
+function App() {
   const [options, setOptions] = useState([]);
   const [proPickRate, setProPickRate] = useState([]);
   const [pubPickRate, setPubPickRate] = useState([]);
@@ -351,4 +351,4 @@ function App(props) {
   );
 }
 
-export default App;
+export default App

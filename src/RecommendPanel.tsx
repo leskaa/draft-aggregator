@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 import RecommendEntry from './RecommendEntry';
 
 const RecommendationsList = styled.ul`
@@ -11,7 +11,25 @@ const RecommendationsList = styled.ul`
   list-style-type: none;
 `;
 
-function RecommendPanel(props) {
+type Reason = {
+  name: string;
+  winrate: number;
+  team: string;
+};
+
+type Recommendation = {
+  heroId: number;
+  name: string;
+  winrate: number;
+  short_name: string;
+  reasonList: Reason[];
+};
+
+type RecommendPanelProps = {
+  recommendations: Recommendation[];
+};
+
+function RecommendPanel(props: RecommendPanelProps) {
   return (
     <RecommendationsList>
       {props.recommendations.map(recommendation => (

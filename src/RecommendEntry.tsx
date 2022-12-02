@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 import Modal from 'react-modal';
 
 import BreakdownInfo from './BreakdownInfo';
@@ -101,7 +101,21 @@ const Winrate = styled.span`
   order: 3;
 `;
 
-function RecommendEntry(props) {
+type Reason = {
+  name: string;
+  winrate: number;
+  team: string;
+};
+
+type RecommendEntryProps = {
+  heroId: number;
+  name: string;
+  winrate: number;
+  imageName: string;
+  reasonList: Reason[];
+};
+
+function RecommendEntry(props: RecommendEntryProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const openModal = () => {

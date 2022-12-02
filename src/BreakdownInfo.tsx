@@ -1,6 +1,17 @@
 import React from 'react';
 
-function BreakdownInfo(props) {
+type Reason = {
+  name: string;
+  winrate: number;
+  team: string;
+};
+
+type BreakdownInfoProps = {
+  hero: string;
+  reasons: Reason[];
+}
+
+function BreakdownInfo(props: BreakdownInfoProps) {
   let reasonList = props.reasons.sort((a, b) => b.winrate - a.winrate);
   return (
     <div>
@@ -31,7 +42,7 @@ function BreakdownInfo(props) {
               }
               key={i}
             >
-              {(e.winrate * 100).toString().substr(0, 4)}%
+              {(e.winrate * 100).toString().substring(0, 4)}%
               {e.winrate >= 0.5 ? ' ☝️' : ' 👇'}
             </strong>
           </div>

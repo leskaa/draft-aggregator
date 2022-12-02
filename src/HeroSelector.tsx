@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import Select from 'react-select';
-import styled from 'styled-components';
+import Select, { StylesConfig } from 'react-select';
+import styled from '@emotion/styled';
 
 const DotaSelect = styled(Select)`
   padding: 0.25em;
@@ -9,7 +9,7 @@ const DotaSelect = styled(Select)`
   color: #a0a3a6;
 `;
 
-const customStyles = {
+const customStyles: StylesConfig = {
   control: (base, state) => ({
     ...base,
     background: '#2F363D',
@@ -20,7 +20,7 @@ const customStyles = {
     // Overwrittes the different states of border
     borderColor: state.isFocused ? '#545A60' : '#545A60',
     // Removes weird border around container
-    boxShadow: state.isFocused ? null : null,
+    boxShadow: undefined,
     '&:hover': {
       // Overwrittes the different states of border
       borderColor: state.isFocused ? '#7A7F83' : '#7A7F83',
@@ -32,18 +32,26 @@ const customStyles = {
   }),
 };
 
-function HeroSelector(props) {
-  const [selected, setSelected] = useState(null);
+type HeroSelectorProps = {
+  key: number;
+  removeFromTeam: (heroId: number, team: number) => void;
+  addToTeam: (heroId: number, team: number, oldHeroId: number) => void;
+  team: number;
+  options: Array<{ id: number; localized_name: string }>;
+}
 
-  const handleChange = selection => {
-    if (selected && !selection) {
+function HeroSelector(props: HeroSelectorProps) {
+  const [selected, setSelected] = useState<any>(null);
+
+  const handleChange = (option: any) => {
+    if (selected && !option) {
       props.removeFromTeam(selected.value, props.team);
-    } else if (selected && selection) {
-      props.addToTeam(selection.value, props.team, selected.value);
-    } else if (!selected && selection) {
-      props.addToTeam(selection.value, props.team, -1);
+    } else if (selected && option) {
+      props.addToTeam(option.value, props.team, selected.value);
+    } else if (!selected && option) {
+      props.addToTeam(option.value, props.team, -1);
     }
-    setSelected(selection);
+    setSelected(option);
   };
 
   return (
@@ -51,7 +59,7 @@ function HeroSelector(props) {
       styles={customStyles}
       value={selected}
       onChange={handleChange}
-      isClearable="true"
+      isClearable={true}
       placeholder=""
       options={props.options.map(option => ({
         value: option.id,
