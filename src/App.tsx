@@ -1,305 +1,175 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 
-import { uniqBy } from './uniqBy';
-import HeroSelector from './HeroSelector';
-import RecommendPanel from './RecommendPanel';
-import ConfigPanel from './ConfigPanel';
+import {
+  OpenDotaHeroStats,
+  Option,
+  ProPickRate,
+  PubWinRate,
+  MatchupSet,
+  StratzDryad,
+  Recommendation
+} from './types'
+import HeroSelector from './HeroSelector'
+import RecommendPanel from './RecommendPanel'
+import ConfigPanel from './ConfigPanel'
 
-import './App.css';
+import './App.css'
 
 function App() {
-  const [options, setOptions] = useState([]);
-  const [proPickRate, setProPickRate] = useState([]);
-  const [pubPickRate, setPubPickRate] = useState([]);
-  const [synergies, setSynergies] = useState([]);
-  const [counters, setCounters] = useState([]);
-  const [recommendations, setRecommendations] = useState([]);
-  const [weightConfigs, setWeightConfigs] = useState([60, 20, 20]);
+  const [options, setOptions] = useState<Option[]>([])
+  const [proPickRate, setProPickRate] = useState<ProPickRate[]>([])
+  const [pubWinRate, setPubWinRate] = useState<PubWinRate[]>([])
+  const [synergies, setSynergies] = useState<MatchupSet[]>([])
+  const [counters, setCounters] = useState<MatchupSet[]>([])
+  const [weightConfigs, setWeightConfigs] = useState<number[]>([40, 20, 20, 20])
 
-  useEffect(() => {
-    let teamData = [...counters, ...synergies];
-    // Render empty list with nothing selected
-    if (teamData.length === 0) {
-      setRecommendations([]);
-      return;
-    }
-    teamData = teamData.map(matchupSet => ({
-      hero: matchupSet.hero,
-      matchups: matchupSet.matchups.map(matchup => ({
-        heroId: matchup.hero_id,
-        winrate: matchup.winrate,
-      })),
-    }));
-    // Remove already picked heroes from matchup data
-    let pickedHeroes = [];
-    synergies.forEach(matchups => pickedHeroes.push(matchups.hero));
-    counters.forEach(matchups => pickedHeroes.push(matchups.hero));
-    teamData.forEach(matchupSet => {
-      matchupSet.matchups = matchupSet.matchups.filter(option => {
-        return !pickedHeroes.includes(option.heroId) ? true : false;
-      });
-      matchupSet.matchups.sort((a, b) => (a.heroId > b.heroId ? 1 : -1));
-    });
-    let matchupOptions = options.filter(option => {
-      return !pickedHeroes.includes(option.id) ? true : false;
-    });
-    // Calculate the average matchup values
-    let averageTeamData = [];
-    const mostContestedRateHero = proPickRate.reduce((x, y) => {
-      const xContested = x.picks + x.bans;
-      const yContested = y.picks + y.bans;
-      return xContested > yContested ? x : y;
-    });
-    const mostContestedRate =
-      mostContestedRateHero.picks + mostContestedRateHero.bans;
-    for (let i = 0; i < matchupOptions.length; i++) {
-      let total = 0;
-      let reasonList = [];
-      if (weightConfigs[0] > 0) {
-        teamData.forEach(matchupSet => {
-          let team =
-            counters.filter(counter => counter.hero === matchupSet.hero)
-              .length > 0
-              ? 'counter'
-              : 'synergy';
-          let winrate = matchupSet.matchups[i].winrate;
-          total += winrate;
-          reasonList.push({
-            hero: matchupSet.hero,
-            name: options.filter(option => option.id === matchupSet.hero)[0]
-              .localized_name,
-            team: team,
-            winrate: winrate,
-          });
-        });
-      }
-      let heroPickRate = proPickRate.find(
-        hero => hero.id === teamData[0].matchups[i].heroId
-      );
-      let contestedRate = heroPickRate.picks + heroPickRate.bans;
-      let contestedPercent =
-        (contestedRate / mostContestedRate - 0.5) / 3 + 0.6;
-      if (contestedPercent > 0.55) {
-        contestedPercent = contestedPercent - (contestedPercent - 0.55) / 1.25;
-      } else if (contestedPercent < 0.45) {
-        contestedPercent = contestedPercent + (0.45 - contestedPercent) / 1.25;
-      }
-      if (weightConfigs[1] > 0) {
-        reasonList.push({
-          hero: teamData[0].matchups[i].heroId,
-          name: matchupOptions[i].localized_name,
-          team: 'meta',
-          winrate: contestedPercent,
-        });
-      }
-      let heroWinRate = pubPickRate.find(
-        hero => hero.id === teamData[0].matchups[i].heroId
-      );
-      heroWinRate = heroWinRate === undefined ? 0.5 : heroWinRate.winrate;
-      if (weightConfigs[2] > 0) {
-        reasonList.push({
-          hero: teamData[0].matchups[i].heroId,
-          name: matchupOptions[i].localized_name,
-          team: 'pub',
-          winrate: heroWinRate,
-        });
-      }
-      averageTeamData.push({
-        heroId: teamData[0].matchups[i].heroId,
-        name: matchupOptions[i].localized_name,
-        short_name: matchupOptions[i].short_name,
-        winrate:
-          ((total / teamData.length) * weightConfigs[0] +
-            contestedPercent * weightConfigs[1] +
-            heroWinRate * weightConfigs[2]) /
-          100,
-        reasonList: reasonList,
-      });
-    }
-    averageTeamData.sort((a, b) => (a.winrate < b.winrate ? 1 : -1));
-    setRecommendations(averageTeamData);
-  }, [counters, options, proPickRate, pubPickRate, synergies, weightConfigs]);
+  const averageProContestedRate =
+    proPickRate.reduce((acc, cur) => acc + cur.picks + cur.bans, 0) /
+    proPickRate.length
+
+  let recommendations: Recommendation[] = []
+
+  const teamData: MatchupSet[] = [...counters, ...synergies]
+
+  if (teamData.length !== 0) {
+    recommendations = options
+      .filter((option) => {
+        return !teamData.some(
+          (matchupSet) => matchupSet.heroId === option.heroId
+        )
+      })
+      .map((option) => ({
+        heroId: option.heroId,
+        name: option.localized_name,
+        short_name: option.short_name,
+        winrate: option.base_winrate,
+        reasonList: [
+          { heroId: 0, name: 'Anti-Mage', team: 'Synergy', winrate: 0.5 }
+        ]
+      }))
+  }
 
   // TODO: Improve selection option logic
   // https://stackoverflow.com/questions/26137309/remove-selected-option-from-another-select-box
-  const removeFromTeam = (heroId, team) => {
-    if (team === '0') {
-      setSynergies(synergies.filter(matchupSet => matchupSet.hero !== heroId));
-    } else if (team === '1') {
-      setCounters(counters.filter(matchupSet => matchupSet.hero !== heroId));
+  const removeFromTeam = (heroId: number, team: number) => {
+    if (team === 0) {
+      setSynergies(
+        synergies.filter((matchupSet) => matchupSet.heroId !== heroId)
+      )
+    } else if (team === 1) {
+      setCounters(counters.filter((matchupSet) => matchupSet.heroId !== heroId))
     }
-  };
+  }
 
   // TODO: Add loading to deal with api delay
-  const addToTeam = (heroId, team, remove) => {
+  const addToTeam = (heroId: number, team: number, oldHeroId: number) => {
     // TODO: Using Stratz API
-    if (team === '0') {
-      Promise.all([
-        fetch(
-          `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=4,5,6,7,8&matchLimit=0&week=2611`
-        ).then(response => {
-          if (response.ok) {
-            return response.json();
-          } else {
-            throw new Error('Non-200 Response');
-          }
-        }),
-        fetch(
-          `https://api.stratz.com/api/v1/Hero/${heroId}/dryad?take=${options.length}&rank=4,5,6,7,8&matchLimit=0`
-        ).then(response => {
-          if (response.ok) {
-            return response.json();
-          } else {
-            throw new Error('Non-200 Response');
-          }
-        }),
-      ])
-        .then(([currentData, oldData]) => {
-          const currentWith = currentData[0].with.sort((a, b) => a.id - b.id);
-          const oldWith = oldData[0].with.sort((a, b) => a.id - b.id);
-          let mappedMatchups = [];
-          for (let i = 0; i < currentData[0].with.length; i++) {
-            mappedMatchups.push({
-              hero_id: currentWith[i].heroId2,
-              winrate:
-                0.5 + (currentWith[i].synergy + oldWith[i].synergy) / 200,
-            });
-          }
-          const uniqueMappedMatchups = uniqBy(mappedMatchups, 'hero_id');
-          setSynergies([
-            ...synergies.filter(matchupSet => matchupSet.hero !== remove),
-            {
-              hero: heroId,
-              team: team,
-              matchups: uniqueMappedMatchups,
-            },
-          ]);
-        })
-        .catch(error =>
-          console.log('Stratz API matchups fetch failed: ' + error)
-        );
-    }
-
-    if (team === '1') {
-      fetch(`https://api.opendota.com/api/heroes/${heroId}/matchups`)
-        .then(response => {
-          if (response.ok) {
-            return response.json();
-          } else {
-            throw new Error('Non-200 Response');
-          }
-        })
-        .then(counterData => {
-          const data = counterData.sort((a, b) => a.hero_id - b.hero_id);
-          let mappedMatchups = [];
-          let index = 0;
-          options.forEach(option => {
-            if (data[index]?.hero_id === option.id) {
-              mappedMatchups.push({
-                hero_id: data[index].hero_id,
-                winrate:
-                  data[index].games_played > 9
-                    ? (option.base_winrate -
-                        data[index].wins / data[index].games_played) /
-                        4 +
-                      0.5
-                    : 0.5,
-              });
-              index++;
-            } else if (option.id !== heroId) {
-              mappedMatchups.push({
-                hero_id: option.id,
-                winrate: 0.5,
-              });
-            }
-          });
-          const uniqueMappedMatchups = uniqBy(mappedMatchups, 'hero_id');
+    fetch(`http://localhost:9999/.netlify/functions/matchups/${heroId}`)
+      .then((response) => {
+        if (response.ok) {
+          return response.json()
+        } else {
+          throw new Error('Non-200 Response')
+        }
+      })
+      .then((data) => {
+        const synergyData = data.heroStats.matchUp[0].with
+        const counterData = data.heroStats.matchUp[0].vs
+        if (team === 0) {
           setCounters([
-            ...counters.filter(matchupSet => matchupSet.hero !== remove),
+            ...counters.filter((matchupSet) => matchupSet.heroId !== oldHeroId),
             {
-              hero: heroId,
+              heroId: heroId,
               team: team,
-              matchups: uniqueMappedMatchups,
-            },
-          ]);
-        })
-        .catch(error =>
-          console.log('OpenDota API matchups fetch failed: ' + error)
-        );
-    }
-  };
-
-  useEffect(() => {
-    fetch('https://api.stratz.com/api/v1/Hero/winHour')
-      .then(response => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new Error('Non-200 Response');
+              matchups: counterData.map((stratzDryad: StratzDryad) => ({
+                heroId: stratzDryad.heroId2,
+                winrate: stratzDryad.winCount / stratzDryad.matchCount
+              }))
+            }
+          ])
+        }
+        if (team === 1) {
+          setSynergies([
+            ...synergies.filter(
+              (matchupSet) => matchupSet.heroId !== oldHeroId
+            ),
+            {
+              heroId: heroId,
+              team: team,
+              matchups: synergyData.map((stratzDryad: StratzDryad) => ({
+                heroId: stratzDryad.heroId2,
+                winrate: stratzDryad.winCount / stratzDryad.matchCount
+              }))
+            }
+          ])
         }
       })
-      .then(data => {
-        setPubPickRate(
-          data.now.slice(0, options.length).map(hero => ({
-            id: hero.heroId,
-            winrate: hero.wins / hero.count,
-          }))
-        );
-      })
-      .catch(error => console.log('Stratz API winHour fetch failed: ' + error));
-  }, [options.length]);
+      .catch((error) => console.log('Netlify matchups fetch failed: ' + error))
+  }
 
   useEffect(() => {
     fetch('https://api.opendota.com/api/heroStats')
-      .then(response => {
+      .then((response) => {
         if (response.ok) {
-          return response.json();
+          return response.json()
         } else {
-          throw new Error('Non-200 Response');
+          throw new Error('Non-200 Response')
         }
       })
-      .then(data => {
+      .then((data: OpenDotaHeroStats[]) => {
         setOptions(
-          Object.values(data).map(option => ({
-            id: option.id,
-            localized_name: option.localized_name,
-            short_name: option.name.substring(14),
+          Object.values(data).map((openDotaHeroStats: OpenDotaHeroStats) => ({
+            heroId: openDotaHeroStats.id,
+            localized_name: openDotaHeroStats.localized_name,
+            short_name: openDotaHeroStats.name.substring(14),
             base_winrate:
-              option.pro_pick > 10 ? option.pro_win / option.pro_pick : 0.5,
+              openDotaHeroStats.pro_pick > 10
+                ? openDotaHeroStats.pro_win / openDotaHeroStats.pro_pick
+                : 0.5
           }))
-        );
-      })
-      .catch(error =>
-        console.log('Stratz API hero list fetch failed: ' + error)
-      );
-  }, []);
-
-  useEffect(() => {
-    fetch('https://api.opendota.com/api/heroStats')
-      .then(response => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new Error('Non-200 Response');
-        }
-      })
-      .then(data => {
+        )
         setProPickRate(
-          data.map(hero => ({
-            id: hero.id,
-            picks: hero.pro_pick,
-            bans: hero.pro_ban,
+          data.map((openDotaHeroStats: OpenDotaHeroStats) => ({
+            heroId: openDotaHeroStats.id,
+            picks: openDotaHeroStats.pro_pick,
+            bans: openDotaHeroStats.pro_ban
           }))
-        );
+        )
+        setPubWinRate(
+          data.map((openDotaHeroStats: OpenDotaHeroStats) => {
+            const {
+              id: heroId,
+              '8_win': immortalWins,
+              '7_win': divineWins,
+              '6_win': ancientWins,
+              '5_win': legendWins,
+              '8_pick': immortalPicks,
+              '7_pick': divinePicks,
+              '6_pick': ancientPicks,
+              '5_pick': legendPicks
+            } = openDotaHeroStats
+            return {
+              heroId,
+              winrate:
+                (immortalWins + divineWins + ancientWins + legendWins) /
+                (immortalPicks + divinePicks + ancientPicks + legendPicks)
+            }
+          })
+        )
       })
-      .catch(error =>
+      .catch((error) =>
         console.log('OpenDota API heroStats fetch failed: ' + error)
-      );
-  }, []);
+      )
+  }, [])
 
-  const handleConfigChange = (counterWeight, proWeight, pubWeight) => {
-    setWeightConfigs([counterWeight, proWeight, pubWeight]);
-  };
+  const handleConfigChange = (
+    counterWeight: number,
+    synergyWeight: number,
+    proWeight: number,
+    pubWeight: number
+  ) => {
+    setWeightConfigs([counterWeight, synergyWeight, proWeight, pubWeight])
+  }
 
   return (
     <div>
@@ -321,7 +191,7 @@ function App() {
               removeFromTeam={removeFromTeam}
               addToTeam={addToTeam}
               options={options}
-              team="0"
+              team={0}
             ></HeroSelector>
           ))}
         </div>
@@ -333,7 +203,7 @@ function App() {
               removeFromTeam={removeFromTeam}
               addToTeam={addToTeam}
               options={options}
-              team="1"
+              team={1}
             ></HeroSelector>
           ))}
         </div>
@@ -348,7 +218,7 @@ function App() {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 export default App

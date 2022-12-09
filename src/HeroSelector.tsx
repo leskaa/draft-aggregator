@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
-import Select, { StylesConfig } from 'react-select';
-import styled from '@emotion/styled';
+import React, { useState } from 'react'
+import Select, { StylesConfig } from 'react-select'
+import styled from '@emotion/styled'
+import { Option } from './types'
 
 const DotaSelect = styled(Select)`
   padding: 0.25em;
   margin-left: 0.5em;
   margin-right: 0.5em;
   color: #a0a3a6;
-`;
+`
 
 const customStyles: StylesConfig = {
   control: (base, state) => ({
@@ -23,36 +24,36 @@ const customStyles: StylesConfig = {
     boxShadow: undefined,
     '&:hover': {
       // Overwrittes the different states of border
-      borderColor: state.isFocused ? '#7A7F83' : '#7A7F83',
-    },
+      borderColor: state.isFocused ? '#7A7F83' : '#7A7F83'
+    }
   }),
   option: (provided, state) => ({
     ...provided,
-    color: state.isSelected ? '#fefefe' : '#a0a3a6',
-  }),
-};
+    color: state.isSelected ? '#fefefe' : '#a0a3a6'
+  })
+}
 
 type HeroSelectorProps = {
-  key: number;
-  removeFromTeam: (heroId: number, team: number) => void;
-  addToTeam: (heroId: number, team: number, oldHeroId: number) => void;
-  team: number;
-  options: Array<{ id: number; localized_name: string }>;
+  key: number
+  removeFromTeam: (heroId: number, team: number) => void
+  addToTeam: (heroId: number, team: number, oldHeroId: number) => void
+  team: number
+  options: Option[]
 }
 
 function HeroSelector(props: HeroSelectorProps) {
-  const [selected, setSelected] = useState<any>(null);
+  const [selected, setSelected] = useState<any>(null)
 
   const handleChange = (option: any) => {
     if (selected && !option) {
-      props.removeFromTeam(selected.value, props.team);
+      props.removeFromTeam(selected.value, props.team)
     } else if (selected && option) {
-      props.addToTeam(option.value, props.team, selected.value);
+      props.addToTeam(option.value, props.team, selected.value)
     } else if (!selected && option) {
-      props.addToTeam(option.value, props.team, -1);
+      props.addToTeam(option.value, props.team, -1)
     }
-    setSelected(option);
-  };
+    setSelected(option)
+  }
 
   return (
     <DotaSelect
@@ -61,11 +62,11 @@ function HeroSelector(props: HeroSelectorProps) {
       onChange={handleChange}
       isClearable={true}
       placeholder=""
-      options={props.options.map(option => ({
-        value: option.id,
-        label: option.localized_name,
+      options={props.options.map((option) => ({
+        value: option.heroId,
+        label: option.localized_name
       }))}
-      theme={theme => ({
+      theme={(theme) => ({
         ...theme,
         colors: {
           ...theme.colors,
@@ -87,11 +88,11 @@ function HeroSelector(props: HeroSelectorProps) {
           neutral60: '#A0A3A6',
           neutral70: '#A0A3A6',
           neutral80: '#A0A3A6',
-          neutral90: '#A0A3A6',
-        },
+          neutral90: '#A0A3A6'
+        }
       })}
     />
-  );
+  )
 }
 
-export default HeroSelector;
+export default HeroSelector

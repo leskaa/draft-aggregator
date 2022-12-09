@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
-import styled from '@emotion/styled';
-import Modal from 'react-modal';
+import React, { useState } from 'react'
+import styled from '@emotion/styled'
+import Modal from 'react-modal'
 
-import BreakdownInfo from './BreakdownInfo';
+import BreakdownInfo from './BreakdownInfo'
 
-Modal.setAppElement('#root');
+Modal.setAppElement('#root')
 
 const modalStyles = {
   overlay: {
     backgroundColor: 'rgba(47, 54, 61, 0.75)',
-    zIndex: '10',
+    zIndex: '10'
   },
   content: {
     color: '#fefefe',
@@ -21,9 +21,9 @@ const modalStyles = {
     bottom: 'auto',
     marginRight: '-50%',
     transform: 'translate(-50%, -50%)',
-    zIndex: '10',
-  },
-};
+    zIndex: '10'
+  }
+}
 
 const NameList = styled.li`
   font-family: 'Gothic A1', sans-serif;
@@ -45,13 +45,13 @@ const NameList = styled.li`
     z-index: 5;
     position: relative;
   }
-`;
+`
 
 const Name = styled.div`
   margin-left: 0.5em;
   margin-right: 0.5em;
   flex-basis: 100%;
-`;
+`
 
 const Reason = styled.span`
   font-size: 0.35cm;
@@ -62,83 +62,81 @@ const Reason = styled.span`
   @media screen and (max-width: 1080px) {
     display: none;
   }
-`;
+`
 
 const ReasonCounters = styled(Reason)`
   color: #167c13;
-`;
+`
 
 const ReasonSynergizes = styled(Reason)`
   color: #598307;
-`;
+`
 
 const ReasonCountered = styled(Reason)`
   color: #a52a2a;
-`;
+`
 
 const ReasonAntiSynergy = styled(Reason)`
   color: #4682b4;
-`;
+`
 
 const ReasonMeta = styled(Reason)`
   color: #daa520;
-`;
+`
 
 const ReasonNotMeta = styled(Reason)`
   color: #5b388f;
-`;
+`
 
 const ReasonPubMeta = styled(Reason)`
   color: #64d74a;
-`;
+`
 
 const ReasonNotPubMeta = styled(Reason)`
   color: #476291;
-`;
+`
 
 const Winrate = styled.span`
   margin-left: auto;
   order: 3;
-`;
+`
 
 type Reason = {
-  name: string;
-  winrate: number;
-  team: string;
-};
+  name: string
+  winrate: number
+  team: string
+}
 
 type RecommendEntryProps = {
-  heroId: number;
-  name: string;
-  winrate: number;
-  imageName: string;
-  reasonList: Reason[];
-};
+  heroId: number
+  name: string
+  winrate: number
+  imageName: string
+  reasonList: Reason[]
+}
 
 function RecommendEntry(props: RecommendEntryProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false)
 
   const openModal = () => {
-    setIsOpen(true);
-  };
+    setIsOpen(true)
+  }
 
   const closeModal = () => {
-    setIsOpen(false);
-  };
+    setIsOpen(false)
+  }
 
-  const afterOpenModal = () => {};
+  const imageURL = `https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/${props.imageName}.png`
 
-  let imageURL = `http://cdn.dota2.com/apps/dota2/images/heroes/${props.imageName}_sb.png`;
-
-  let topReasons = props.reasonList
+  const topReasons = props.reasonList
     .sort((a, b) => Math.abs(b.winrate - 0.5) - Math.abs(a.winrate - 0.5))
-    .filter(reason => Math.abs(reason.winrate - 0.5) > 0.04)
-    .slice(0, 2);
+    .filter((reason) => Math.abs(reason.winrate - 0.5) > 0.04)
+    .slice(0, 2)
 
   return (
     <div>
       <NameList key={props.heroId} onClick={openModal}>
-        <img src={imageURL} alt={props.name}></img>
+        <img src={imageURL} alt={props.name} height={33}></img>
         <Name>{props.name}</Name>
         {topReasons.map((e, i) => {
           if (e.team === 'pub') {
@@ -147,7 +145,7 @@ function RecommendEntry(props: RecommendEntryProps) {
                 <ReasonPubMeta key={i}>
                   Pub <strong>Meta </strong>
                 </ReasonPubMeta>
-              );
+              )
             }
             return (
               <ReasonNotPubMeta key={i}>
@@ -155,7 +153,7 @@ function RecommendEntry(props: RecommendEntryProps) {
                 <br />
                 <strong>Winrate </strong>
               </ReasonNotPubMeta>
-            );
+            )
           }
           if (e.team === 'meta') {
             if (e.winrate > 0.5) {
@@ -169,7 +167,7 @@ function RecommendEntry(props: RecommendEntryProps) {
                     </span>
                   </strong>
                 </ReasonMeta>
-              );
+              )
             }
             return (
               <ReasonNotMeta key={i}>
@@ -181,7 +179,7 @@ function RecommendEntry(props: RecommendEntryProps) {
                   </span>
                 </strong>
               </ReasonNotMeta>
-            );
+            )
           }
           if (e.team === 'counter') {
             if (e.winrate > 0.5) {
@@ -190,14 +188,14 @@ function RecommendEntry(props: RecommendEntryProps) {
                   Counters <br />
                   <strong>{e.name}</strong>
                 </ReasonCounters>
-              );
+              )
             }
             return (
               <ReasonCountered key={i}>
                 Countered <br />
                 <strong>{e.name} </strong>
               </ReasonCountered>
-            );
+            )
           }
           if (e.winrate > 0.5) {
             return (
@@ -205,20 +203,19 @@ function RecommendEntry(props: RecommendEntryProps) {
                 Synergy <br />
                 <strong>{e.name}</strong>
               </ReasonSynergizes>
-            );
+            )
           }
           return (
             <ReasonAntiSynergy key={i}>
               Anti-Synergy <br />
               <strong>{e.name}</strong>
             </ReasonAntiSynergy>
-          );
+          )
         })}
         <Winrate>{(props.winrate * 100).toString().substr(0, 4)}%</Winrate>
       </NameList>
       <Modal
         isOpen={isOpen}
-        onAfterOpen={afterOpenModal}
         onRequestClose={closeModal}
         style={modalStyles}
         contentLabel="Example Modal"
@@ -230,7 +227,7 @@ function RecommendEntry(props: RecommendEntryProps) {
         {/* <button onClick={closeModal}>close</button> */}
       </Modal>
     </div>
-  );
+  )
 }
 
-export default RecommendEntry;
+export default RecommendEntry

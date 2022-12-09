@@ -45,11 +45,18 @@ const handler: Handler = async (event: HandlerEvent, context: HandlerContext) =>
     return {
       statusCode: 200,
       body: JSON.stringify(response),
+      headers: {
+        "access-control-allow-origin": "*",
+      }
     }
   } catch (error) {
+    console.error(error);
     return {
       statusCode: 500,
-      body: JSON.stringify(error),
+      body: `Error querying stratz matchup data for hero ${heroId}`,
+      headers: {
+        "access-control-allow-origin": "*",
+      }
     }
   }
 };
